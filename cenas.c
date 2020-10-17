@@ -1,175 +1,98 @@
-/*graph.h*/
-#ifndef _GRAPH_H_
-#define _GRAPH_H_
-
-typedef enum {UNDIRECTED=0,DIRECTED} graph_type_e;
-
-/* Adjacency list node*/
-typedef struct adjlist_node
-{
-    int vertex;                /*Index to adjacency list array*/
-    struct adjlist_node *next; /*Pointer to the next node*/
-}adjlist_node_t, *adjlist_node_p;
-
-/* Adjacency list */
-typedef struct adjlist
-{
-    int num_members;           /*number of members in the list (for future use)*/
-    adjlist_node_t *head;      /*head of the adjacency linked list*/
-}adjlist_t, *adjlist_p;
-
-/* Graph structure. A graph is an array of adjacency lists.
-   Size of array will be number of vertices in graph*/
-typedef struct graph
-{
-    graph_type_e type;        /*Directed or undirected graph */
-    int num_vertices;         /*Number of vertices*/
-    adjlist_p adjListArr;     /*Adjacency lists' array*/
-}graph_t, *graph_p;
-
-/* Exit function to handle fatal errors*/
-__inline void err_exit(char* msg)
-{
-    printf("[Fatal Error]: %s \nExiting...\n", msg);
-    exit(1);
-}
-
-#endif
-
-
-
-/*graph.c*/
 #include <stdio.h>
-#include <stdlib.h>
-#include "graph.h"
+ #include <stdlib.h>
+ #include <string.h>
 
-/* Function to create an adjacency list node*/
-adjlist_node_p createNode(int v)
+int count = 0;//count for adjlist place for vertices
+
+struct AdjListNode
 {
-    adjlist_node_p newNode = (adjlist_node_p)malloc(sizeof(adjlist_node_t));
-    if(!newNode)
-        err_exit("Unable to allocate memory for new node");
+    char name[10];//lecture name
+    struct AdjListNode* next;
+    int id;//id for place of vertex in array of graph
+};
+struct AdjListNode *desti, *source, *newNode, *temp, *pCrawl; 
 
-    newNode->vertex = v;
+struct AdjList
+{
+    struct AdjListNode *head;  // pointer to head node of list
+};
+struct AdjList *array;
+
+struct Graph
+{
+    int it;
+    int V;
+    struct AdjList* array;
+};
+struct Graph *graph;
+
+struct AdjListNode* newAdjListNode(char name[10])
+{
+    struct AdjListNode* newNode = (struct AdjListNode*) malloc(sizeof(struct AdjListNode));
+    memcpy(newNode->name, name, sizeof newNode->name);
+    newNode->id = count;
     newNode->next = NULL;
+
 
     return newNode;
 }
 
-/* Function to create a graph with n vertices; Creates both directed and undirected graphs*/
-graph_p createGraph(int n, graph_type_e type)
+struct Graph* createGraph(int V)
 {
+    struct Graph* graph = (struct Graph*) malloc(sizeof(struct Graph));
+    graph->V = V;
+    graph->it = 0;
+
+    // Create an array of adjacency lists.  Size of array will be V
+    graph->array = (struct AdjList*) malloc(V * sizeof(struct AdjList));
+
+    // Initialize each adjacency list as empty by making head as NULL
     int i;
-    graph_p graph = (graph_p)malloc(sizeof(graph_t));
-    if(!graph)
-        err_exit("Unable to allocate memory for graph");
-    graph->num_vertices = n;
-    graph->type = type;
-
-    /* Create an array of adjacency lists*/
-    graph->adjListArr = (adjlist_p)malloc(n * sizeof(adjlist_t));
-    if(!graph->adjListArr)
-        err_exit("Unable to allocate memory for adjacency list array");
-
-    for(i = 0; i < n; i++)
-    {
-        graph->adjListArr[i].head = NULL;
-        graph->adjListArr[i].num_members = 0;
-    }
+    for (i = 0; i < V; ++i)
+        graph->array[i].head = NULL;
 
     return graph;
 }
 
-/*Destroys the graph*/
-void destroyGraph(graph_p graph)
-{
-    if(graph)
-    {
-        if(graph->adjListArr)
-        {
-            int v;
-            /*Free up the nodes*/
-            for (v = 0; v < graph->num_vertices; v++)
-            {
-                adjlist_node_p adjListPtr = graph->adjListArr[v].head;
-                while (adjListPtr)
-                {
-                    adjlist_node_p tmp = adjListPtr;
-                    adjListPtr = adjListPtr->next;
-                    free(tmp);
-                }
-            }
-            /*Free the adjacency list array*/
-            free(graph->adjListArr);
-        }
-        /*Free the graph*/
-        free(graph);
-    }
+void addEdge(struct Graph* graph, char src[10], char dest[10])
+{;
+    //i create destination vertex and source vertex
+    struct AdjListNode* desti = newAdjListNode(dest);//
+    struct AdjListNode* source = newAdjListNode(src);
+    struct AdjListNode * temp=graph->array[0].head;
+    //i try to connect them 
+    graph->array[0].head=source;
+    graph->array[0].head->next=desti;
+    ++(graph->it);
+
+    if(temp)
+    desti->next=temp->next;
 }
 
-/* Adds an edge to a graph*/
-void addEdge(graph_t *graph, int src, int dest)
+void printGraph(struct Graph* graph)
 {
-    /* Add an edge from src to dst in the adjacency list*/
-    adjlist_node_p newNode = createNode(dest);
-    newNode->next = graph->adjListArr[src].head;
-    graph->adjListArr[src].head = newNode;
-    graph->adjListArr[src].num_members++;
-
-    if(graph->type == UNDIRECTED)
+    int v;
+    struct AdjListNode* pCrawl = graph->array[0].head;
+    for (v = 0; v <= graph->it; ++v)
     {
-        /* Add an edge from dest to src also*/
-        newNode = createNode(src);
-        newNode->next = graph->adjListArr[dest].head;
-        graph->adjListArr[dest].head = newNode;
-        graph->adjListArr[dest].num_members++;
-    }
-}
 
-/* Function to print the adjacency list of graph*/
-void displayGraph(graph_p graph)
-{
-    int i;
-    for (i = 0; i < graph->num_vertices; i++)
-    {
-        adjlist_node_p adjListPtr = graph->adjListArr[i].head;
-        printf("\n%d: ", i);
-        while (adjListPtr)
-        {
-            printf("%d->", adjListPtr->vertex);
-            adjListPtr = adjListPtr->next;
-        }
-        printf("NULL\n");
-    }
+        printf("name: %s   ", pCrawl->name);
+        pCrawl=pCrawl->next;
 }
-
+        printf("\n");
+}
 int main()
 {
-    graph_p undir_graph = createGraph(5, UNDIRECTED);
-    graph_p dir_graph = createGraph(5, DIRECTED);
-    addEdge(undir_graph, 0, 1);
-    addEdge(undir_graph, 0, 4);
-    addEdge(undir_graph, 1, 2);
-    addEdge(undir_graph, 1, 3);
-    addEdge(undir_graph, 1, 4);
-    addEdge(undir_graph, 2, 3);
-    addEdge(undir_graph, 3, 4);
+    // create the graph given in above fugure
+    int V = 5;
+    struct Graph* graph = createGraph(V);
+    //newAdjListNode("BS11");
+    //newAdjListNode("CS10");
+    //newAdjListNode("MATH10"); 
+    addEdge(graph, "CS10", "MATH10");
 
-    addEdge(dir_graph, 0, 1);
-    addEdge(dir_graph, 0, 4);
-    addEdge(dir_graph, 1, 2);
-    addEdge(dir_graph, 1, 3);
-    addEdge(dir_graph, 1, 4);
-    addEdge(dir_graph, 2, 3);
-    addEdge(dir_graph, 3, 4);
+    addEdge(graph, "BS11", "CS10");
 
-    printf("\nUNDIRECTED GRAPH");
-    displayGraph(undir_graph);
-    destroyGraph(undir_graph);
-
-    printf("\nDIRECTED GRAPH");
-    displayGraph(dir_graph);
-    destroyGraph(dir_graph);
-
+    printGraph(graph);
     return 0;
 }
