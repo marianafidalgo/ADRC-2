@@ -34,18 +34,15 @@ struct Queue{
 
 struct node* createNode(char *id_node);
 struct Graph* createGraph(int v);
+struct Queue* createQ(int v);
 void addEdge(struct Graph* graph, char * src, char * dest, int v);
 void printGraph(struct Graph* graph);
 
 int connected(struct Graph* graph, int n_nodes);
 
-int * BFS(struct Graph* graph, int size);
+char * BFS(struct Graph* graph, int size);
 int pop_queue( struct Queue *q );
 int push_queue( struct Queue *q, int new_id );
-
-
-//struct Queue *initArray(int size);
-
 
 
 

@@ -40,6 +40,24 @@ struct Graph* createGraph(int v) {
   return graph;
 }
 
+struct Queue* createQ(int v)
+{
+  struct Queue *q = malloc(sizeof(struct Queue));
+
+  q->array = malloc (v*sizeof (int));
+
+  if ( q->array )
+  {
+    q->size =v;
+    q->count = 0;
+    q->head = 0;
+    q->tail = 0;
+  }
+  return q;
+}
+
+
+
 /* Adds an edge to a graph*/
 void addEdge(struct Graph* graph, char * src, char * dest, int v){
 
@@ -98,59 +116,68 @@ void printGraph(struct Graph* graph)
     }
 }
 
-int * BFS(struct Graph* graph, int size){
+char * BFS(struct Graph* graph, int size){
 
-  //visited list
-
+  int next = 0;
+  int id_name_pos = 0;
   //fifo list
-  struct Queue *q;
-  q->array = malloc( sizeof q->array * size );
-  if ( q->array )
-  {
-    q->size =size;
-    q->count = 0;
-    q->head = 0;
-    q->tail = 0;
-  }
+  struct Queue* q = createQ(size);
 
+  char * id_name[size];
 
-  struct node* pCrawl = graph->a_list[0].head;
+  struct node* temp = graph->a_list[0].head;
 
-  //int id_init = pCrawl->id;
+  id_name[id_name_pos] = temp->name;
 
-  graph->visited[0]= 1;
 
   push_queue(q, 0);
 
-  while(q->count != -1){
-    int id = pop_queue(q);
-    printf("Visited: %d\n", id);
+  while (q->count != 0){
 
-    struct node* temp = graph->a_list[id].head;
+      int id = pop_queue(q);
 
-    while(temp){
-      int adjV = 0;//temp->id;
-      if (graph->visited[adjV] == 0) {
-        graph->visited[adjV] = 1;
-        push_queue(q, adjV);
+      printf("Visited: %d\n", id); //-> corresponde a um name
+
+      for(int i =0; i <= size; i++)
+      {
+        if(graph->a_list[i].head == NULL){
+          break;
+        }
+        else if(id_name[id] == graph->a_list[i].head->name && graph->visited[i] == 0){
+          temp =graph->a_list[i].head;
+          break;
+        }
       }
-      temp = temp->next;
-    }
+      while(temp)
+      {
+          printf("nameee%s\n", temp->name);
+          if (graph->visited[id_name_pos] == 0) {
+            graph->visited[id_name_pos] = 1;
+            push_queue(q, id_name_pos);
+          }
+          if(id_name_pos<= size){
+            id_name[id_name_pos] = temp->name;
+            id_name_pos++;
+          }
+          temp=temp->next;
+
+      }
+
   }
 
-  return graph->visited;
+  return *id_name;
 }
 
 int connected(struct Graph* graph, int n_nodes) {
-
-    int discovered[n_nodes];
     //pick node from graph
-    int * visited = BFS(graph, n_nodes );
+    BFS(graph, n_nodes);
     int gc = 1;
-    for(int i = 0; i< n_nodes; i++)
-      if(visited[i] == 0)
+    for(int i = 0; i< n_nodes; i++){
+      if(graph->visited[i] == 0){
+        printf("aqui 0\n");
         gc = 0;
-
+      }
+    }
     return gc;
 }
 
@@ -183,6 +210,11 @@ int pop_queue( struct Queue *q )
   {
     item = q->array[q->head];
     q->head++;
+    if(q->head > q->tail)
+    {
+      //reset queue
+      q->head = q->tail = 0;
+    }
     q->count--;
   }
 

@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #include "functions.h"
 
 int main() {
@@ -54,9 +53,9 @@ int main() {
     //save last src id for BFS
 
   // function CONNECTED
-    // int result;
-    // result = connected(graph, n_nodes);
-    // printf("Connected? %d\n", result);
+    int result;
+    result = connected(graph, n_nodes);
+    printf("Connected? %d\n", result);
 
   return(0);
 }

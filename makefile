@@ -4,7 +4,7 @@ CC=gcc  #compiler
 TARGET=proj #target file name
 
 all:    projeto1.o algorithms.o
-	$(CC) projeto1.c algorithms.c -o $(TARGET)
+	$(CC) -g projeto1.c algorithms.c -o $(TARGET)
 
 clean:
 	rm *.o $(TARGET)
