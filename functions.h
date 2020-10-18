@@ -10,15 +10,10 @@ struct node {
 
 struct node *desti, *source, *newNode, *temp, *pCrawl;
 
-struct A_List {
-  char* name;
-  struct node *head;
-};
-
 struct Graph {
     int num_V;
     int it;
-    struct A_List* a_list;
+    struct node ** a_list;
     int *visited;
 };
 
@@ -40,9 +35,10 @@ void printGraph(struct Graph* graph);
 
 int connected(struct Graph* graph, int n_nodes);
 
-char * BFS(struct Graph* graph, int size);
+void BFS(struct Graph* graph, int size);
 int pop_queue( struct Queue *q );
 int push_queue( struct Queue *q, int new_id );
+
 
 
 

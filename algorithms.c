@@ -7,32 +7,33 @@ int count = 0;
 // Create a new node
 struct node* createNode(char *name) {
 
-  struct node* newNode = (struct node*)malloc(sizeof(struct node));
-  newNode->name = malloc(strlen(name) *sizeof(char));
+  struct node* newNode = malloc(sizeof(struct node));
+  newNode->name = malloc(strlen(name)+1);
 
   strcpy(newNode->name, name);
 
   newNode->id = count;
   newNode->next = NULL;
 
-
   return newNode;
 }
 
 // Create a graph of V vertices
 struct Graph* createGraph(int v) {
+
   struct Graph* graph = malloc(sizeof(struct Graph));
 
   graph->num_V = v;
   graph->it = 0;
 
 // Create vertical array of nodes (size v)
-  graph->a_list =  (struct A_List *)malloc( v*sizeof(struct A_List));
+  graph->a_list = malloc(v * sizeof(struct node));
 
-  graph->visited =  malloc( v*sizeof(int));
+  graph->visited = malloc(v * sizeof (int *));
+
 
   for (int i = 0; i <= v; i++){
-    graph->a_list[i].head = NULL;
+    graph->a_list[i] = NULL;
     graph->visited[i] = 0;
 
   }
@@ -44,7 +45,7 @@ struct Queue* createQ(int v)
 {
   struct Queue *q = malloc(sizeof(struct Queue));
 
-  q->array = malloc (v*sizeof (int));
+  q->array = malloc (v*sizeof (int*));
 
   if ( q->array )
   {
@@ -62,7 +63,6 @@ struct Queue* createQ(int v)
 void addEdge(struct Graph* graph, char * src, char * dest, int v){
 
     //i create destination vertex and source vertex
-    printf("%s, %s\n", src, dest);
     struct node* desti = createNode(dest);//
     struct node* source = createNode(src);
     struct node * temp;
@@ -70,8 +70,8 @@ void addEdge(struct Graph* graph, char * src, char * dest, int v){
     //empty list
     if (graph->it == 0)
     {
-      graph->a_list[0].head=source;
-      graph->a_list[0].head->next=desti;
+      graph->a_list[0]=source;
+      graph->a_list[0]->next=desti;
       ++(graph->it);
 
     }
@@ -80,10 +80,10 @@ void addEdge(struct Graph* graph, char * src, char * dest, int v){
       for (int i = 0; i <= (graph->it); i++){
         //adj empty
 
-        temp = graph->a_list[i].head;
+        temp = graph->a_list[i];
         if(temp == NULL){
-          graph->a_list[i].head=source;
-          graph->a_list[i].head->next=desti;
+          graph->a_list[i]=source;
+          graph->a_list[i]->next=desti;
           ++(graph->it);
           break;
 
@@ -96,27 +96,25 @@ void addEdge(struct Graph* graph, char * src, char * dest, int v){
         }
       }
     }
-
-
 }
 
 // Print the graph
 void printGraph(struct Graph* graph)
 {
-    struct node* pCrawl;
+    struct node* temp;
 
     for (int i = 0; i <= graph->it; i++){
-      pCrawl = graph->a_list[i].head;
-      while(pCrawl)
+      temp = graph->a_list[i];
+      while(temp)
       {
-          printf(" %s   ", pCrawl->name);
-          pCrawl=pCrawl->next;
+          printf(" %s   ", temp->name);
+          temp=temp->next;
       }
       printf("\n");
     }
 }
 
-char * BFS(struct Graph* graph, int size){
+void BFS(struct Graph* graph, int size){
 
   int next = 0;
   int id_name_pos = 0;
@@ -125,47 +123,46 @@ char * BFS(struct Graph* graph, int size){
 
   char * id_name[size];
 
-  struct node* temp = graph->a_list[0].head;
+  struct node* temp = graph->a_list[0];
 
   id_name[id_name_pos] = temp->name;
 
-
   push_queue(q, 0);
+  printf("Visited: %d\n", id_name_pos); //-> corresponde a um name
 
   while (q->count != 0){
 
-      int id = pop_queue(q);
+    int id = pop_queue(q);
 
-      printf("Visited: %d\n", id); //-> corresponde a um name
-
-      for(int i =0; i <= size; i++)
-      {
-        if(graph->a_list[i].head == NULL){
-          break;
-        }
-        else if(id_name[id] == graph->a_list[i].head->name && graph->visited[i] == 0){
-          temp =graph->a_list[i].head;
-          break;
-        }
+    for(int i = 0; i <= size; i++)
+    {
+      if(graph->a_list[i] == NULL){
+        break;
       }
-      while(temp)
-      {
-          printf("nameee%s\n", temp->name);
-          if (graph->visited[id_name_pos] == 0) {
-            graph->visited[id_name_pos] = 1;
-            push_queue(q, id_name_pos);
-          }
+      else if(id_name[id] == graph->a_list[i]->name && graph->visited[i] == 0){
+        temp = graph->a_list[i];
+        break;
+      }
+    }
+    while(temp)
+    {
+        if (graph->visited[id_name_pos] == 0) {
           if(id_name_pos<= size){
             id_name[id_name_pos] = temp->name;
-            id_name_pos++;
           }
-          temp=temp->next;
+          graph->visited[id_name_pos] = 1;
+          printf("Visited: %d\n", id_name_pos); //-> corresponde a um name
+          push_queue(q, id_name_pos);
+          if(id_name_pos<= size)
+            id_name_pos++;
+        }
+        temp=temp->next;
 
-      }
-
+    }
   }
+  free(q->array);
+  free(q);
 
-  return *id_name;
 }
 
 int connected(struct Graph* graph, int n_nodes) {
@@ -174,7 +171,6 @@ int connected(struct Graph* graph, int n_nodes) {
     int gc = 1;
     for(int i = 0; i< n_nodes; i++){
       if(graph->visited[i] == 0){
-        printf("aqui 0\n");
         gc = 0;
       }
     }
