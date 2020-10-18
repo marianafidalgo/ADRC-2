@@ -48,7 +48,7 @@ int main() {
         else if (type == 2)
         {
             addEdge(graph, src, dest,n_nodes);
-            addEdge(graph, src, dest,n_nodes);
+            addEdge(graph, dest, src,n_nodes);
 
         }
     }
