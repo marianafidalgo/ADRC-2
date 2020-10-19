@@ -12,7 +12,7 @@ struct node* createNode(char *name) {
 
   strcpy(newNode->name, name);
 
-  newNode->id = count;
+  newNode->id = 0;
   newNode->next = NULL;
 
   return newNode;
@@ -23,44 +23,41 @@ struct Graph* createGraph(int v) {
 
   struct Graph* graph = malloc(sizeof(struct Graph));
 
-  graph->num_V = v;
+  graph->num_V = 0;
   graph->it = 0;
 
 // Create vertical array of nodes (size v)
   graph->a_list = malloc(v * sizeof(struct node));
 
-  graph->visited = malloc(v * sizeof (int *));
+  graph->visited =(char**) malloc(v * sizeof(char*));
 
-
-  for (int i = 0; i <= v; i++){
-    graph->a_list[i] = NULL;
-    graph->visited[i] = 0;
-
+  for(int i=0; i < v ; ++i )
+  {
+      graph->visited[i] = (char*) malloc(10*sizeof(char)); //2 is for the letter and null terminator
+      strcpy(graph->visited[i] , "");
+      graph->a_list[i] = NULL;
   }
+
+  graph->queue = (char**) malloc(v * sizeof(char*));
+
+  for(int i=0; i < v ; ++i )
+  {
+      graph->queue[i] = (char*) malloc(10*sizeof(char)); //2 is for the letter and null terminator
+      strcpy(graph->queue[i] , "");
+  }
+
+    graph->size =v;
+    graph->count = 0;
+    graph->head = 0;
+    graph->tail = 0;
+
 
   return graph;
 }
 
-struct Queue* createQ(int v)
-{
-  struct Queue *q = malloc(sizeof(struct Queue));
-
-  q->array = malloc (v*sizeof (int*));
-
-  if ( q->array )
-  {
-    q->size =v;
-    q->count = 0;
-    q->head = 0;
-    q->tail = 0;
-  }
-  return q;
-}
-
-
 
 /* Adds an edge to a graph*/
-void addEdge(struct Graph* graph, char * src, char * dest, int v){
+void addEdge(struct Graph* graph, char * src, char * dest){
 
     //i create destination vertex and source vertex
     struct node* desti = createNode(dest);//
@@ -91,7 +88,6 @@ void addEdge(struct Graph* graph, char * src, char * dest, int v){
         else if(strcmp(temp->name, src) == 0){
             desti->next=temp->next;
             temp->next =desti;
-
             break;
         }
       }
@@ -114,101 +110,108 @@ void printGraph(struct Graph* graph)
     }
 }
 
-void BFS(struct Graph* graph, int size){
+struct Graph* BFS(struct Graph* graph, int size){
 
-  int id_name_pos = 0;
+  int flag = 0;
+  int id_visited = 0;
   //fifo list
-  struct Queue* q = createQ(size);
-
-  char * id_name[size];
 
   struct node* temp = graph->a_list[0];
 
-  id_name[id_name_pos] = temp->name;
+  push_queue(graph, graph->a_list[0]->name);
 
-  push_queue(q, 0);
-  printf("Visited: %d\n", id_name_pos); //-> corresponde a um name
+  while (graph->count != 0){
 
-  while (q->count != 0){
-
-    int id = pop_queue(q);
+    graph->visited[id_visited] = pop_queue(graph);
 
     for(int i = 0; i <= size; i++)
     {
+
       if(graph->a_list[i] == NULL){
         break;
       }
-      else if(id_name[id] == graph->a_list[i]->name && graph->visited[i] == 0){
+      else if(strcmp(graph->visited[id_visited] ,graph->a_list[i]->name ) == 0){
         temp = graph->a_list[i];
+        temp=temp->next;
         break;
       }
     }
+    flag = 0;
     while(temp)
     {
-      printf("Visited: %d\n", id_name_pos); //-> corresponde a um name
-      push_queue(q, id_name_pos);
-      graph->visited[id_name_pos] = 1;
-      if(id_name_pos<= size){
-        id_name[id_name_pos] = temp->name;
-        id_name_pos++;
+      for(int i = 0; i <= size; i++)
+      {
+        if(strcmp(temp->name,graph->queue[i])== 0){
+          flag = -1;
+          break;
+        }
+
+        if(strcmp("",graph->queue[i])== 0)
+          break;
       }
 
+      if(flag ==0){
+        push_queue(graph, temp->name);
+      }
       temp=temp->next;
-
     }
+
+    id_visited++;
   }
-  free(q->array);
-  free(q);
+
+  return graph;
 
 }
 
-int connected(struct Graph* graph, int n_nodes) {
+int connected(struct Graph* graph, int size, int nodes) {
     //pick node from graph
-    BFS(graph, n_nodes);
+    graph = BFS(graph, size);
+
     int gc = 1;
-    for(int i = 0; i< n_nodes; i++){
-      if(graph->visited[i] == 0){
+    printf("nodes %d\n", nodes);
+    for(int i = 0; i< nodes; i++){
+      if(graph->visited[i] == ""){
         gc = 0;
       }
     }
     return gc;
 }
 
-int push_queue( struct Queue *q, int new_id )
+int push_queue(struct Graph* graph, char* new_id )
 {
 
-  if ( q->count == q->size )
+  if ( graph->count == graph->size )
   {
     // queue full, handle as appropriate
     return 0;
   }
   else
   {
-    q->array[q->tail] = new_id;
-    q->count++;
-    q->tail++;
+    strcpy(graph->queue[graph->tail] , new_id);
+    graph->count++;
+    graph->tail++;
   }
 }
 
-int pop_queue( struct Queue *q )
+char * pop_queue( struct Graph* graph )
 {
-  int item;
-  if ( q->count == 0 )
+  char* item;
+  if ( graph->count == 0 )
   {
     // queue is empty
-    item = -1;
+
     return 0;
   }
   else
   {
-    item = q->array[q->head];
-    q->head++;
-    if(q->head > q->tail)
+    strcpy(item , graph->queue[graph->head]);
+    graph->head++;
+    if(graph->head > graph->tail)
     {
       //reset queue
-      q->head = q->tail = 0;
+      graph->head = graph->tail = 0;
     }
-    q->count--;
+    graph->count--;
   }
 
   return item;

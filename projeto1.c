@@ -16,7 +16,7 @@ int main() {
     char *dest = NULL;
     char *type_  = NULL;
 
-    internet = fopen("int.txt", "r");
+    internet = fopen("disc.txt", "r");
     if (internet == NULL)
         exit(EXIT_FAILURE);
 
@@ -24,12 +24,16 @@ int main() {
         ++lines;
 
     rewind(internet);
-    int n_nodes = lines/2;
+    int links = lines;
+    //number max  65, 535
 
-    struct Graph* graph = createGraph(n_nodes);
+    struct Graph * graph = createGraph(links);
     struct node * temp;
 
     lines = 0;
+    int t2=0;
+    int nos = 0;
+    int nodes;
 
     while ((read = getline(&line, &len, internet)) != -1) {
 
@@ -42,13 +46,11 @@ int main() {
         type = atoi(type_);
 
         if (type == 1){
-            addEdge(graph, src, dest, n_nodes);
-
+            addEdge(graph, src, dest);
         }
         else if (type == 2)
         {
-            addEdge(graph, src, dest,n_nodes);
-
+            addEdge(graph, src, dest);
         }
     }
 
@@ -58,7 +60,8 @@ int main() {
 
     // function CONNECTED
     int result;
-    result = connected(graph, n_nodes);
+
+    result = connected(graph, links, nodes);
     if(result == 1)
         printf("The internet is connected\n");
     else
