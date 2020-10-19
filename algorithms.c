@@ -88,7 +88,7 @@ void addEdge(struct Graph* graph, char * src, char * dest, int v){
           break;
 
         }
-        else if(strcmp(temp->name, src) == 0 ){
+        else if(strcmp(temp->name, src) == 0){
             desti->next=temp->next;
             temp->next =desti;
 
@@ -116,7 +116,6 @@ void printGraph(struct Graph* graph)
 
 void BFS(struct Graph* graph, int size){
 
-  int next = 0;
   int id_name_pos = 0;
   //fifo list
   struct Queue* q = createQ(size);
@@ -146,17 +145,15 @@ void BFS(struct Graph* graph, int size){
     }
     while(temp)
     {
-        if (graph->visited[id_name_pos] == 0) {
-          if(id_name_pos<= size){
-            id_name[id_name_pos] = temp->name;
-          }
-          graph->visited[id_name_pos] = 1;
-          printf("Visited: %d\n", id_name_pos); //-> corresponde a um name
-          push_queue(q, id_name_pos);
-          if(id_name_pos<= size)
-            id_name_pos++;
-        }
-        temp=temp->next;
+      printf("Visited: %d\n", id_name_pos); //-> corresponde a um name
+      push_queue(q, id_name_pos);
+      graph->visited[id_name_pos] = 1;
+      if(id_name_pos<= size){
+        id_name[id_name_pos] = temp->name;
+        id_name_pos++;
+      }
+
+      temp=temp->next;
 
     }
   }
