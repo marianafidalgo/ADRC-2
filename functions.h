@@ -3,7 +3,7 @@
 
 
 struct node {
-  char* name;
+  int name;
   int type;
   int counted;
   struct node *next;
@@ -15,8 +15,8 @@ struct Graph {
     int num_V;
     int it;
     struct node ** a_list;
-    char **visited;
-    char **queue; //store the data
+    int * visited;
+    int * queue; //store the data
     size_t size; // max size of queue
     size_t count; //n_items in queue
     size_t head; //location to pop from
@@ -25,17 +25,16 @@ struct Graph {
 
 struct Graph *graph;
 
-struct node* createNode(char *id_node);
+struct node* createNode(int id_node);
 struct Graph* createGraph(int v);
 struct Queue* createQ(int v);
-void addEdge(struct Graph* graph, char * src, char * dest, int type);
+void addEdge(struct Graph* graph, int src, int dest, int type);
 void printGraph(struct Graph* graph);
-
 int connected(struct Graph* graph, int size, int nodes);
 int CheckComm(struct Graph* graph, int size);
 struct Graph* BFS(struct Graph* graph, int size);
-char* pop_queue( struct Graph* graph );
-int push_queue( struct Graph* graph, char * );
+int pop_queue( struct Graph* graph );
+int push_queue( struct Graph* graph, int a );
 
 
 
