@@ -4,6 +4,8 @@
 
 #include "functions.h"
 
+#define MAX_NODES 65536
+
 int main() {
 
     FILE * internet;
@@ -16,21 +18,20 @@ int main() {
     char *dest = NULL;
     char *type_  = NULL;
 
-    internet = fopen("disc.txt", "r");
+    internet = fopen("com.txt", "r");
     if (internet == NULL)
         exit(EXIT_FAILURE);
 
-    while (EOF != (fscanf(internet, "%*[^\n]"), fscanf(internet,"%*c")))
-        ++lines;
+    // while (EOF != (fscanf(internet, "%*[^\n]"), fscanf(internet,"%*c")))
+    //     ++lines;
 
-    rewind(internet);
-    int links = lines;
-    //number max  65, 535
+    // rewind(internet);
+    long int links = 65535;
 
     struct Graph * graph = createGraph(links);
     struct node * temp;
 
-    lines = 0;
+    // lines = 0;
     int t2=0;
     int nos = 0;
     int nodes;
@@ -45,16 +46,18 @@ int main() {
 
         type = atoi(type_);
 
-        if (type == 1){
-            addEdge(graph, src, dest);
-        }
-        else if (type == 2)
-        {
-            addEdge(graph, src, dest);
-        }
+        // if (type == 1){
+        //     addEdge(graph, src, dest, type);
+        // }
+        // else if (type == 2)
+        // {
+        //     addEdge(graph, src, dest, type);
+        // }
+
+        addEdge(graph, src, dest, type);
     }
 
-    printGraph(graph);
+    //printGraph(graph);
     fclose(internet);
 
 

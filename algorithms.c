@@ -12,7 +12,8 @@ struct node* createNode(char *name) {
 
   strcpy(newNode->name, name);
 
-  newNode->id = 0;
+  newNode->counted = 0;
+  newNode->type = 0;
   newNode->next = NULL;
 
   return newNode;
@@ -57,7 +58,7 @@ struct Graph* createGraph(int v) {
 
 
 /* Adds an edge to a graph*/
-void addEdge(struct Graph* graph, char * src, char * dest){
+void addEdge(struct Graph* graph, char * src, char * dest, int type){
 
     //i create destination vertex and source vertex
     struct node* desti = createNode(dest);//
@@ -67,7 +68,13 @@ void addEdge(struct Graph* graph, char * src, char * dest){
     //empty list
     if (graph->it == 0)
     {
+      source ->type = 1;
       graph->a_list[0]=source;
+      if(type == 1)
+        desti->type = 3;
+      else
+        desti->type = 2;
+
       graph->a_list[0]->next=desti;
       ++(graph->it);
 
@@ -79,6 +86,11 @@ void addEdge(struct Graph* graph, char * src, char * dest){
 
         temp = graph->a_list[i];
         if(temp == NULL){
+          source ->type = 1;
+          if(type == 1)
+            desti->type = 3;
+          else
+            desti->type = 2;
           graph->a_list[i]=source;
           graph->a_list[i]->next=desti;
           ++(graph->it);
@@ -86,6 +98,10 @@ void addEdge(struct Graph* graph, char * src, char * dest){
 
         }
         else if(strcmp(temp->name, src) == 0){
+            if(type == 1)
+              desti->type = 3;
+            else
+              desti->type = 2;
             desti->next=temp->next;
             temp->next =desti;
             break;
@@ -103,30 +119,27 @@ void printGraph(struct Graph* graph)
       temp = graph->a_list[i];
       while(temp)
       {
-          printf(" %s   ", temp->name);
+          printf(" %s,%d   ", temp->name, temp->type);
           temp=temp->next;
       }
       printf("\n");
     }
 }
 
-struct Graph* BFS(struct Graph* graph, int size){
+struct Graph* BFS(struct Graph* graph_, int size){
 
   int flag = 0;
   int id_visited = 0;
   //fifo list
-
+  struct Graph* graph = graph_;
   struct node* temp = graph->a_list[0];
 
   push_queue(graph, graph->a_list[0]->name);
-
   while (graph->count != 0){
-
     graph->visited[id_visited] = pop_queue(graph);
 
     for(int i = 0; i <= size; i++)
     {
-
       if(graph->a_list[i] == NULL){
         break;
       }
@@ -165,17 +178,57 @@ struct Graph* BFS(struct Graph* graph, int size){
 
 int connected(struct Graph* graph, int size, int nodes) {
     //pick node from graph
+    int n_nos = 0;
+    printf("Connected\n");
+    //n_nos = CheckComm(graph, size);
+
     graph = BFS(graph, size);
 
     int gc = 1;
-    printf("nodes %d\n", nodes);
-    for(int i = 0; i< nodes; i++){
-      if(graph->visited[i] == ""){
+
+    for(int i = 0; i < graph->it; i++){
+      //printf("g1 %s\n", graph->visited[i]);
+      if(strcmp(graph->visited[i], "")==0){
         gc = 0;
+        break;
       }
     }
     return gc;
 }
+
+int CheckComm(struct Graph* graph, int size)
+{
+  struct node* temp;
+  int tier1[size];
+  int nodes = 0;
+
+  for(int i = 0; i< size; i++){
+    tier1[i] = -1;
+  }
+
+    for (int i = 0; i <= size; i++){
+      if(graph->a_list[i] == NULL){
+        break;
+      }
+      temp = graph->a_list[i];
+      if(tier1[atoi(temp->name)] == -1){
+        tier1[atoi(temp->name)] = 1;
+        nodes++;
+      }
+      temp=temp->next;
+      while(temp)
+      {
+          if(temp->type != 2 && tier1[atoi(temp->name)] != 0){
+            tier1[atoi(temp->name)]=0;
+            nodes++;
+          }
+          temp=temp->next;
+      }
+    }
+
+  return  nodes;
+}
+
 
 int push_queue(struct Graph* graph, char* new_id )
 {
@@ -195,7 +248,8 @@ int push_queue(struct Graph* graph, char* new_id )
 
 char * pop_queue( struct Graph* graph )
 {
-  char* item;
+  int len = strlen(graph->queue[graph->head]);
+  char *item = malloc(len*sizeof(char*));
   if ( graph->count == 0 )
   {
     // queue is empty

@@ -4,7 +4,8 @@
 
 struct node {
   char* name;
-  int id;
+  int type;
+  int counted;
   struct node *next;
 };
 
@@ -15,7 +16,6 @@ struct Graph {
     int it;
     struct node ** a_list;
     char **visited;
-
     char **queue; //store the data
     size_t size; // max size of queue
     size_t count; //n_items in queue
@@ -25,18 +25,14 @@ struct Graph {
 
 struct Graph *graph;
 
-struct Queue{
-
-};
-
 struct node* createNode(char *id_node);
 struct Graph* createGraph(int v);
 struct Queue* createQ(int v);
-void addEdge(struct Graph* graph, char * src, char * dest);
+void addEdge(struct Graph* graph, char * src, char * dest, int type);
 void printGraph(struct Graph* graph);
 
 int connected(struct Graph* graph, int size, int nodes);
-
+int CheckComm(struct Graph* graph, int size);
 struct Graph* BFS(struct Graph* graph, int size);
 char* pop_queue( struct Graph* graph );
 int push_queue( struct Graph* graph, char * );
