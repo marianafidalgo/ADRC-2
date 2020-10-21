@@ -27,7 +27,7 @@ struct Graph* createGraph(int v) {
   graph->it = 0;
 
 // Create vertical array of nodes (size v)
-  graph->a_list = malloc(v * sizeof(struct node));
+  graph->a_list = (struct node **) malloc(v * sizeof(struct node *));
 
   graph->visited =(int*) malloc(v * sizeof(int*));
   graph->queue = (int*) malloc(v * sizeof(int*));
@@ -52,6 +52,7 @@ struct Graph* createGraph(int v) {
 void addEdge(struct Graph* graph, int src, int dest, int algorithm){
 
     //i create destination vertex and source vertex
+
     struct node* desti = createNode(dest);
     struct node * desti2 = createNode(dest);
     struct node* source = createNode(src);
@@ -66,7 +67,7 @@ void addEdge(struct Graph* graph, int src, int dest, int algorithm){
       desti->next = graph->a_list[src]->next;
       graph->a_list[src]->next = desti;
     }
-    if(algorithm == 3 &&  graph->a_list[dest] == NULL){
+    if(algorithm == 3 && graph->a_list[dest] == NULL){
       graph->a_list[dest] = desti2;
       (graph->num_V)++;
     }

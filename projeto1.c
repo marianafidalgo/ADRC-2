@@ -35,15 +35,7 @@ int main(int argc, char **argv) {
     while (fscanf(internet, "%d %d %d", &src, &dest, &type) == 3){
         if(algorithm == 1){
             addEdge(graph, src, dest, algorithm);
-            // function CONNECTED
-            int result = 0;
-
-            result = connected(graph, links, nodes);
-
-            if(result == 1)
-                printf("The internet is connected\n");
-            else
-                printf("The internet is not connected\n");
+            // function CONNECTED;
         }
         else if(algorithm == 3)
         {
@@ -76,7 +68,7 @@ int main(int argc, char **argv) {
     else if(algorithm == 4){
         //algorithm 4
     }
-    //printGraph(graph);
+
     fclose(internet);
 
   return(0);
