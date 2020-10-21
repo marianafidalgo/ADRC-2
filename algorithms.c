@@ -39,23 +39,22 @@ struct Graph* createGraph(int v) {
       graph->queue[i] = 0;
   }
 
-    graph->size =v;
-    graph->count = 0;
-    graph->head = 0;
-    graph->tail = 0;
-
+  graph->size =v;
+  graph->count = 0;
+  graph->head = 0;
+  graph->tail = 0;
 
   return graph;
 }
 
 
 /* Adds an edge to a graph*/
-void addEdge(struct Graph* graph, int src, int dest, int type){
+void addEdge(struct Graph* graph, int src, int dest, int algorithm){
 
     //i create destination vertex and source vertex
     struct node* desti = createNode(dest);
+    struct node * desti2 = createNode(dest);
     struct node* source = createNode(src);
-    struct node * temp;
 
     temp = graph->a_list[src];
     if(temp == NULL){
@@ -64,8 +63,12 @@ void addEdge(struct Graph* graph, int src, int dest, int type){
       (graph->num_V)++;
     }
     else{
-      desti->next=temp->next;
-      temp->next =desti;
+      desti->next = graph->a_list[src]->next;
+      graph->a_list[src]->next = desti;
+    }
+    if(algorithm == 3 &&  graph->a_list[dest] == NULL){
+      graph->a_list[dest] = desti2;
+      (graph->num_V)++;
     }
 
     // //empty list
@@ -116,19 +119,18 @@ void addEdge(struct Graph* graph, int src, int dest, int type){
 // Print the graph
 void printGraph(struct Graph* graph)
 {
-    struct node* temp;
+  struct node* temp;
 
-    for (int i = 0; i <= graph->size; i++){
-      temp = graph->a_list[i];
-      if(temp!= NULL && temp->name != 0){
-        while(temp)
-        {
-            printf(" %d,%d   ", temp->name, temp->type);
-            temp=temp->next;
-        }
-        printf("\n");
+  for (int i = 0; i <= graph->size; i++){
+    temp = graph->a_list[i];
+    if(temp != NULL && temp->name != 0){
+      while(temp){
+        printf(" %d, %d   ", temp->name, temp->type);
+        temp = temp->next;
       }
+      printf("\n");
     }
+  }
 }
 
 struct Graph* BFS(struct Graph* graph_, int size){
@@ -152,7 +154,7 @@ struct Graph* BFS(struct Graph* graph_, int size){
     graph->visited[id_pop] = 1;
 
     temp = graph->a_list[id_pop];
-    temp=temp->next;
+    temp = temp->next;
 
     flag = 0;
     while(temp)
@@ -164,26 +166,25 @@ struct Graph* BFS(struct Graph* graph_, int size){
           break;
         }
 
-        if(graph->queue[i]== 0)
+        if(graph->queue[i] == 0)
           break;
       }
 
-      if(flag ==0){
+      if(flag == 0){
         push_queue(graph, temp->name);
       }
       flag = 0;
-      temp=temp->next;
+      temp = temp->next;
     }
   }
 
   return graph;
-
 }
 
 int connected(struct Graph* graph, int size, int nodes) {
     //pick node from graph
     int n_nos = 0;
-    printf("Connected\n");
+
     //n_nos = CheckComm(graph, size);
 
     graph = BFS(graph, size);
@@ -198,7 +199,7 @@ int connected(struct Graph* graph, int size, int nodes) {
         break;
       }
     }
-    printf("nos %d, numv %d\n", n_nos, graph->num_V);
+    //printf("nos %d, numv %d\n", n_nos, graph->num_V);
 
     return gc;
 }
@@ -239,7 +240,6 @@ int connected(struct Graph* graph, int size, int nodes) {
 
 int push_queue(struct Graph* graph, int new_id )
 {
-
   if ( graph->count == graph->size )
   {
     // queue full, handle as appropriate
@@ -259,7 +259,6 @@ int pop_queue( struct Graph* graph )
   if ( graph->count == 0 )
   {
     // queue is empty
-
     return 0;
   }
   else
