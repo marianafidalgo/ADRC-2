@@ -9,12 +9,9 @@
 int main(int argc, char **argv) {
 
     FILE * internet;
-    long int lines =0;
+    long int lines = 0;
     int type, src, dest = 0;
     int algorithm = 0;
-    int nodes;
-    ssize_t read;
-    size_t len = 0;
     struct Graph * graph = createGraph(MAX_NODES);
     struct node * temp;
 
@@ -62,7 +59,15 @@ int main(int argc, char **argv) {
             printf("The internet is commercially acyclic\n");
     }
     else if(algorithm == 4){
-        findTier1(graph, MAX_NODES);
+        int result4 = 1;
+        if(graph->tier1[0] != -2)
+            findTier1(graph, MAX_NODES);
+        result4 = CommerciallyConn(graph, MAX_NODES);
+
+        if(result4 == -1)
+            printf("The internet is not commercially connected\n");
+        else
+            printf("The internet is commercially connected\n");
     }
 
     fclose(internet);

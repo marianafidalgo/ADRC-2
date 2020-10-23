@@ -41,7 +41,6 @@ struct Graph* createGraph(int v) {
     graph->tier1[i] = 0;
   }
 
-  graph->size =v;
   graph->count = 0;
   graph->head = 0;
   graph->tail = 0;
@@ -96,13 +95,12 @@ void addEdge(struct Graph* graph, int src, int dest, int type){
 void printGraph(struct Graph* graph)
 {
   struct node* temp;
-  for (int i = 0; i <= graph->size; i++){
+  for (int i = 0; i <= MAX_NODES; i++){
     temp = graph->a_list[i];
     if(temp != NULL){
       printf("%d ->"      , i);
       while(temp){
-        if(temp->type == 2)
-          printf(" %d,%d -> ", temp->name, temp->type);
+        printf(" %d,%d -> ", temp->name, temp->type);
         temp = temp->next;
       }
       printf("\n");
@@ -184,7 +182,8 @@ int findTier1(struct Graph * graph, int size)
   int n_of_tiers1 = 0;
   int n_of_peers_T1 = 0;
 
-  for(int i = 0; i<= size; i++){
+  graph->tier1[0] = -2;
+  for(int i = 1; i<= size; i++){
     graph->tier1[i] = -1;
   }
 
@@ -197,10 +196,13 @@ int findTier1(struct Graph * graph, int size)
       temp = graph->a_list[i];
       if(graph->tier1[i] == -1){
         graph->tier1[i] = 1;
+        (graph->n_tier1)++;
       }
       while(temp)
       {
         if(temp->type == 3 && graph->tier1[temp->name] != 0){
+          if(graph->tier1[temp->name]== 1)
+            (graph->n_tier1)--;
           graph->tier1[temp->name] = 0;
         }
         temp=temp->next;
@@ -209,19 +211,49 @@ int findTier1(struct Graph * graph, int size)
     }
 }
 
+int CommerciallyConn(struct Graph* graph, int size)
+{
+  struct node* temp;
+  int flag = 0;
+  int peert1 = 0;
+  int tier1 = 0;
+
+  printf("num for tier1 %d\n", tier1);
+
+  for(int i = 1; i <= size; i++){
+    if(graph->tier1[i] == 1){
+      temp = graph->a_list[i];
+      while(temp){
+        if(temp->type == 2 && graph->tier1[temp->name] == 1){
+          peert1++;
+        }
+        temp = temp->next;
+      }
+      if(graph->n_tier1 - 1 != peert1){
+        printf("tier %d\n", i);
+        flag = -1;
+        break;
+      }
+    }
+    peert1 = 0;
+  }
+
+  return flag;
+}
+
 int push_queue(struct Graph* graph, int new_id )
 {
-  if ( graph->count == graph->size )
-  {
-    // queue full, handle as appropriate
-    return 0;
-  }
-  else
-  {
+  // if ( graph->count == graph->size )
+  // {
+  //   // queue full, handle as appropriate
+  //   return 0;
+  // }
+  // else
+  // {
     graph->queue[graph->tail] = new_id;
     graph->count++;
     graph->tail++;
-  }
+  //}
 }
 
 int pop_queue( struct Graph* graph )

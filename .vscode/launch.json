@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/proj",
-            "args": ["acyclic.txt",
+            "args": ["4.txt",
                 "debug"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
