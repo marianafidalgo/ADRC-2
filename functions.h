@@ -19,7 +19,7 @@ struct Graph {
     int * visited; //stores visited nodes
     int * queue; //stores sons of visited nodes
     int * tier1; //stores tier-1 nodes
-    int * path;
+    int * curr_path;
     size_t size; // max size of queue
     size_t count; //n_items in queue
     size_t head; //location to pop from

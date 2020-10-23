@@ -31,7 +31,7 @@ struct Graph* createGraph(int v) {
   graph->visited =(int*) malloc(v * sizeof(int*));
   graph->queue = (int*) malloc(v * sizeof(int*));
   graph->tier1 = (int*) malloc(v * sizeof(int*));
-  graph->path = (int*) malloc(v * sizeof(int*));
+  graph->curr_path = (int*) malloc(v * sizeof(int*));
 
   for(int i=0; i < v ; ++i )
   {
@@ -253,20 +253,20 @@ int pop_queue( struct Graph* graph )
 
 int DFS(struct Graph* graph, int v, int discovered[]){
   struct node* temp;
-  int t = 0, i;
-  int path = 0;
+  int cycle = 0, i;
 
   discovered[v] = 1;
-  graph->path[v] = 1;
+  graph->curr_path[v] = 1;
   
   temp = graph->a_list[v];
   while(temp){
-    if(discovered[temp->name] == 1 && temp->type == 3 && graph->path[temp->name] == 1){
-      return 1;
+    if(discovered[temp->name] == 1 && temp->type == 3 && graph->curr_path[temp->name] == 1){
+      cycle = 1;
+      return cycle;
     }
     if(discovered[temp->name] == 0 && temp->type == 3){
-      t = DFS(graph, temp->name, discovered);
-      if(t == 1)
+      cycle = DFS(graph, temp->name, discovered);
+      if(cycle == 1)
         return 1;
     }
     temp = temp->next;
@@ -274,7 +274,7 @@ int DFS(struct Graph* graph, int v, int discovered[]){
 
   graph->path[v] = 0;
 
-  return t;
+  return cycle;
 }
 
 int checkCycles(struct Graph* graph){
