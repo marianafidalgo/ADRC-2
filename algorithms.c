@@ -35,10 +35,10 @@ struct Graph* createGraph(int v) {
 
   for(int i=0; i < v ; ++i )
   {
-      graph->visited[i] = 0;
-      graph->a_list[i] = NULL;
-      graph->queue[i] = 0;
-      graph->tier1[i] = 0;
+    graph->visited[i] = 0;
+    graph->a_list[i] = NULL;
+    graph->queue[i] = 0;
+    graph->tier1[i] = 0;
   }
 
   graph->size =v;
@@ -46,7 +46,6 @@ struct Graph* createGraph(int v) {
   graph->head = 0;
   graph->tail = 0;
   
-
   return graph;
 }
 
@@ -102,7 +101,8 @@ void printGraph(struct Graph* graph)
     if(temp != NULL){
       printf("%d ->"      , i);
       while(temp){
-        printf(" %d,%d -> ", temp->name, temp->type);
+        if(temp->type == 2)
+          printf(" %d,%d -> ", temp->name, temp->type);
         temp = temp->next;
       }
       printf("\n");
@@ -158,32 +158,31 @@ struct Graph* BFS(struct Graph* graph_, int size){
 }
 
 int connected(struct Graph* graph, int size ) {
-    //pick node from graph
-    int n_nos = 0;
+  //pick node from graph
+  int n_nos = 0;
 
-    graph = BFS(graph, size);
+  graph = BFS(graph, size);
 
-    int gc = 0;
+  int gc = 0;
 
-    for(int i = 1; i <= size; i++){
-      if(graph->visited[i]==1)
-        n_nos++;
-      if( n_nos == graph->num_V){
-        gc = 1;
-        break;
-      }
+  for(int i = 1; i <= size; i++){
+    if(graph->visited[i]==1)
+      n_nos++;
+    if( n_nos == graph->num_V){
+      gc = 1;
+      break;
     }
+  }
 
-    return gc;
+  return gc;
 }
 
-int CheckComm(struct Graph* graph, int size)
+int findTier1(struct Graph * graph, int size)
 {
   struct node* temp;
   int count = 0;
   int n_of_tiers1 = 0;
   int n_of_peers_T1 = 0;
-  int nm_of_nodes = 65000;
 
   for(int i = 0; i< size; i++){
     graph->tier1[i] = -1;
@@ -208,6 +207,13 @@ int CheckComm(struct Graph* graph, int size)
       }
       count++;
     }
+
+    printf("Tier1:\n");
+    for(int i = 0; i < MAX_NODES; i++){
+      if(graph->tier1[i] == 1)
+        printf("%d,", i);
+    }
+    printf("\n");
 
   return  0;
 }
@@ -287,7 +293,7 @@ int checkCycles(struct Graph* graph){
     discovered[i] = 0;
   }
 
-  CheckComm(graph, MAX_NODES);
+  findTier1(graph, MAX_NODES);
 
   for(i = 0; i < MAX_NODES; i++){
     if(graph->tier1[i] == 1){

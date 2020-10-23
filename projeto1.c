@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
             printf("The internet is commercially acyclic\n");
     }
     else if(algorithm == 4){
-        CheckComm(graph, MAX_NODES);
+        findTier1(graph, MAX_NODES);
     }
 
     fclose(internet);
