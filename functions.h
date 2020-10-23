@@ -19,7 +19,7 @@ struct Graph {
     int * visited; //stores visited nodes
     int * queue; //stores sons of visited nodes
     int * tier1; //stores tier-1 nodes
-    int * path;
+    int * curr_path;
     size_t size; // max size of queue
     size_t count; //n_items in queue
     size_t head; //location to pop from
@@ -34,7 +34,7 @@ struct Queue* createQ(int v);
 void addEdge(struct Graph* graph, int src, int dest, int type);
 void printGraph(struct Graph* graph);
 int connected(struct Graph* graph, int size);
-void CheckComm(struct Graph* graph, int size);
+int findTier1(struct Graph* graph, int size);
 struct Graph* BFS(struct Graph* graph, int size);
 int pop_queue(struct Graph* graph);
 int push_queue(struct Graph* graph, int a);

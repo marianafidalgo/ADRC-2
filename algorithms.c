@@ -31,14 +31,14 @@ struct Graph* createGraph(int v) {
   graph->visited =(int*) malloc(v * sizeof(int*));
   graph->queue = (int*) malloc(v * sizeof(int*));
   graph->tier1 = (int*) malloc(v * sizeof(int*));
-  graph->path = (int*) malloc(v * sizeof(int*));
+  graph->curr_path = (int*) malloc(v * sizeof(int*));
 
   for(int i=0; i < v ; ++i )
   {
-      graph->visited[i] = 0;
-      graph->a_list[i] = NULL;
-      graph->queue[i] = 0;
-      graph->tier1[i] = 0;
+    graph->visited[i] = 0;
+    graph->a_list[i] = NULL;
+    graph->queue[i] = 0;
+    graph->tier1[i] = 0;
   }
 
   graph->size =v;
@@ -101,7 +101,8 @@ void printGraph(struct Graph* graph)
     if(temp != NULL){
       printf("%d ->"      , i);
       while(temp){
-        printf(" %d,%d -> ", temp->name, temp->type);
+        if(temp->type == 2)
+          printf(" %d,%d -> ", temp->name, temp->type);
         temp = temp->next;
       }
       printf("\n");
@@ -157,32 +158,31 @@ struct Graph* BFS(struct Graph* graph_, int size){
 }
 
 int connected(struct Graph* graph, int size ) {
-    //pick node from graph
-    int n_nos = 0;
+  //pick node from graph
+  int n_nos = 0;
 
-    graph = BFS(graph, size);
+  graph = BFS(graph, size);
 
-    int gc = 0;
+  int gc = 0;
 
-    for(int i = 1; i <= size; i++){
-      if(graph->visited[i]==1)
-        n_nos++;
-      if( n_nos == graph->num_V){
-        gc = 1;
-        break;
-      }
+  for(int i = 1; i <= size; i++){
+    if(graph->visited[i]==1)
+      n_nos++;
+    if( n_nos == graph->num_V){
+      gc = 1;
+      break;
     }
+  }
 
-    return gc;
+  return gc;
 }
 
-void CheckComm(struct Graph* graph, int size)
+int findTier1(struct Graph * graph, int size)
 {
   struct node* temp;
   int count = 0;
   int n_of_tiers1 = 0;
   int n_of_peers_T1 = 0;
-  int nm_of_nodes = 65000;
 
   for(int i = 0; i<= size; i++){
     graph->tier1[i] = -1;
@@ -249,28 +249,28 @@ int pop_queue( struct Graph* graph )
 
 int DFS(struct Graph* graph, int v, int discovered[]){
   struct node* temp;
-  int t = 0, i;
-  int path = 0;
+  int cycle = 0, i;
 
   discovered[v] = 1;
-  graph->path[v] = 1;
+  graph->curr_path[v] = 1;
 
   temp = graph->a_list[v];
   while(temp){
-    if(discovered[temp->name] == 1 && temp->type == 3 && graph->path[temp->name] == 1){
-      return 1;
+    if(discovered[temp->name] == 1 && temp->type == 3 && graph->curr_path[temp->name] == 1){
+      cycle = 1;
+      return cycle;
     }
     if(discovered[temp->name] == 0 && temp->type == 3){
-      t = DFS(graph, temp->name, discovered);
-      if(t == 1)
+      cycle = DFS(graph, temp->name, discovered);
+      if(cycle == 1)
         return 1;
     }
     temp = temp->next;
   }
 
-  graph->path[v] = 0;
+  graph->curr_path[v] = 0;
 
-  return t;
+  return cycle;
 }
 
 int checkCycles(struct Graph* graph){
@@ -283,7 +283,7 @@ int checkCycles(struct Graph* graph){
     discovered[i] = 0;
   }
 
-  CheckComm(graph, MAX_NODES);
+  findTier1(graph, MAX_NODES);
 
   for(i = 0; i < MAX_NODES; i++){
     if(graph->tier1[i] == 1){
