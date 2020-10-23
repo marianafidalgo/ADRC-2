@@ -45,7 +45,6 @@ struct Graph* createGraph(int v) {
   graph->count = 0;
   graph->head = 0;
   graph->tail = 0;
-  
 
   return graph;
 }
@@ -255,7 +254,7 @@ int DFS(struct Graph* graph, int v, int discovered[]){
 
   discovered[v] = 1;
   graph->path[v] = 1;
-  
+
   temp = graph->a_list[v];
   while(temp){
     if(discovered[temp->name] == 1 && temp->type == 3 && graph->path[temp->name] == 1){
