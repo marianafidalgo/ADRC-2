@@ -12,13 +12,10 @@ int main(int argc, char **argv) {
     long int lines =0;
     int type, src, dest = 0;
     int algorithm = 0;
-    int links = MAX_NODES;
-    int t2 = 0;
-    int nos = 0;
     int nodes;
     ssize_t read;
     size_t len = 0;
-    struct Graph * graph = createGraph(links);
+    struct Graph * graph = createGraph(MAX_NODES);
     struct node * temp;
 
     internet = fopen(argv[1], "r");
@@ -33,40 +30,39 @@ int main(int argc, char **argv) {
     scanf("%d", &algorithm);
 
     while (fscanf(internet, "%d %d %d", &src, &dest, &type) == 3){
-        if(algorithm == 1){
-            addEdge(graph, src, dest, algorithm);
-            // function CONNECTED;
-        }
-        else if(algorithm == 3)
-        {
-            if (type == 1)
-               addEdge(graph, src, dest, algorithm);
-
-        }
-        else if(algorithm == 4){
-            if (type == 1)
-                addEdge(graph, src, dest, algorithm);
-            else if (type == 2)
-                addEdge(graph, src, dest, algorithm);
-        }
+        if (type == 1 || type == 2)
+            addEdge(graph, src, dest, type);
     }
+
+    printGraph(graph);
 
     if(algorithm == 1){
-            // function CONNECTED
-            int result = 0;
 
-            result = connected(graph, links, nodes);
+        int result = 0;
 
-            if(result == 1)
-                printf("The internet is connected\n");
-            else
-                printf("The internet is not connected\n");
-        }
+        result = connected(graph, MAX_NODES);
+
+        if(result == 1)
+            printf("The internet is connected\n");
+        else
+            printf("The internet is not connected\n");
+
+    }
+    else if(algorithm == 2){
+        //algorithm 2
+    }
     else if(algorithm == 3){
         printf("nodes %d\n", graph->num_V);
+        int result3 = 0;
+
+        result3 = checkCycles(graph);
+        if(result3 == 1)
+            printf("The internet is not commercially acyclic\n");
+        else
+            printf("The internet is commercially acyclic\n");
     }
     else if(algorithm == 4){
-        //algorithm 4
+        CheckComm(graph, MAX_NODES);
     }
 
     fclose(internet);
