@@ -272,7 +272,7 @@ int DFS(struct Graph* graph, int v, int discovered[]){
     temp = temp->next;
   }
 
-  graph->path[v] = 0;
+  graph->curr_path[v] = 0;
 
   return cycle;
 }
