@@ -19,6 +19,7 @@ struct Graph {
     int * visited; //stores visited nodes
     int * queue; //stores sons of visited nodes
     int * tier1; //stores tier-1 nodes
+    int * path;
     size_t size; // max size of queue
     size_t count; //n_items in queue
     size_t head; //location to pop from
@@ -37,7 +38,7 @@ void CheckComm(struct Graph* graph, int size);
 struct Graph* BFS(struct Graph* graph, int size);
 int pop_queue(struct Graph* graph);
 int push_queue(struct Graph* graph, int a);
-void DFS(struct Graph* graph, int v, int discovered[], int departure[], int time);
+int DFS(struct Graph* graph, int v, int discovered[]);
 int checkCycles(struct Graph* graph);
 
 //name funct BFS
