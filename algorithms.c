@@ -31,6 +31,7 @@ struct Graph* createGraph(int v) {
   graph->visited =(int*) malloc(v * sizeof(int*));
   graph->queue = (int*) malloc(v * sizeof(int*));
   graph->tier1 = (int*) malloc(v * sizeof(int*));
+  graph->path = (int*) malloc(v * sizeof(int*));
 
   for(int i=0; i < v ; ++i )
   {
@@ -44,6 +45,7 @@ struct Graph* createGraph(int v) {
   graph->count = 0;
   graph->head = 0;
   graph->tail = 0;
+  
 
   return graph;
 }
@@ -249,62 +251,48 @@ int pop_queue( struct Graph* graph )
   return item;
 }
 
-void DFS(struct Graph* graph, int v, int discovered[], int departure[], int time){
+int DFS(struct Graph* graph, int v, int discovered[]){
   struct node* temp;
+  int t = 0, i;
+  int path = 0;
+
   discovered[v] = 1;
-
-  time++;
-
-  printf("no %d\n", v);
+  graph->path[v] = 1;
+  
   temp = graph->a_list[v];
   while(temp){
-    printf("daaadd %d\n", temp->name);
+    if(discovered[temp->name] == 1 && temp->type == 3 && graph->path[temp->name] == 1){
+      return 1;
+    }
     if(discovered[temp->name] == 0 && temp->type == 3){
-      printf("ddd %d\n", temp->name);
-      DFS(graph, temp->name, discovered, departure, time);
+      t = DFS(graph, temp->name, discovered);
+      if(t == 1)
+        return 1;
     }
     temp = temp->next;
   }
 
-  departure[v] = time;
-  printf("node: %d time: %d\n", v, time);
+  graph->path[v] = 0;
+
+  return t;
 }
 
 int checkCycles(struct Graph* graph){
   struct node* temp;
   int discovered[MAX_NODES];
-  int departure[MAX_NODES];
-  int time = 0;
   int cycle = 0;
   int i;
 
   for(i = 0; i < MAX_NODES; i++){
     discovered[i] = 0;
-    departure[i] = 0;
   }
 
   CheckComm(graph, MAX_NODES);
 
   for(i = 0; i < MAX_NODES; i++){
     if(graph->tier1[i] == 1){
-      printf("tier1: %d\n", graph->tier1[i]);
       if(discovered[i] == 0)
-        DFS(graph, i, discovered, departure, time);
-    }
-  }
-
-  for(i = 0; i < MAX_NODES; i++){
-    temp = graph->a_list[i];
-    while(temp){
-      if(temp->type == 3){
-        printf("deeedd %d\n", temp->name);
-        if(departure[i] < departure[temp->name]){
-          printf("nodes: %d %d, time: %d %d\n", i, temp->name, departure[i], departure[temp->name]);
-          cycle = 1;
-          return cycle;
-        }
-      }
-      temp = temp->next;
+        cycle = DFS(graph, i, discovered);
     }
   }
 
