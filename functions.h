@@ -33,7 +33,7 @@ struct Queue* createQ(int v);
 void addEdge(struct Graph* graph, int src, int dest, int type);
 void printGraph(struct Graph* graph);
 int connected(struct Graph* graph, int size);
-int CheckComm(struct Graph* graph, int size);
+void CheckComm(struct Graph* graph, int size);
 struct Graph* BFS(struct Graph* graph, int size);
 int pop_queue(struct Graph* graph);
 int push_queue(struct Graph* graph, int a);

@@ -116,7 +116,7 @@ struct Graph* BFS(struct Graph* graph_, int size){
   struct Graph* graph = graph_;
   struct node* temp = graph->a_list[0];
 
-  for(int i = 0; i < size; i++)
+  for(int i = 0; i <= size; i++)
   {
     if(graph->a_list[i] != NULL){
       push_queue(graph, graph->a_list[i]->name);
@@ -175,7 +175,7 @@ int connected(struct Graph* graph, int size ) {
     return gc;
 }
 
-int CheckComm(struct Graph* graph, int size)
+void CheckComm(struct Graph* graph, int size)
 {
   struct node* temp;
   int count = 0;
@@ -183,7 +183,7 @@ int CheckComm(struct Graph* graph, int size)
   int n_of_peers_T1 = 0;
   int nm_of_nodes = 65000;
 
-  for(int i = 0; i< size; i++){
+  for(int i = 0; i<= size; i++){
     graph->tier1[i] = -1;
   }
 
@@ -206,10 +206,7 @@ int CheckComm(struct Graph* graph, int size)
       }
       count++;
     }
-
-  return  0;
 }
-
 
 int push_queue(struct Graph* graph, int new_id )
 {
