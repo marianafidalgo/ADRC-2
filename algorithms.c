@@ -3,6 +3,26 @@
 #include <string.h>
 #include "functions.h"
 
+void freeAll(struct Graph* graph){
+  struct node * temp;
+
+  for (int i = 0; i < MAX_NODES; i++){
+    while(graph->a_list[i] != NULL){
+      printf("no %d        ", i);
+      temp = graph->a_list[i];
+      printf("free %d\n", temp->name);
+      graph->a_list[i] = graph->a_list[i]->next;
+      free(temp);
+    }
+  }
+
+  free(graph->visited);
+  free(graph->queue);
+  free(graph->tier1);
+  free(graph->curr_path);
+  free(graph->a_list);
+  free(graph);
+}
 int count = 0;
 // Create a new node
 struct node* createNode(int id_node, int type) {
@@ -18,7 +38,7 @@ struct node* createNode(int id_node, int type) {
 }
 
 // Create a graph of V vertices
-struct Graph* createGraph(int v) {
+struct Graph* createGraph() {
 
   struct Graph* graph = malloc(sizeof(struct Graph));
 
@@ -26,14 +46,13 @@ struct Graph* createGraph(int v) {
   graph->it = 0;
 
 // Create vertical array of nodes (size v)
-  graph->a_list = (struct node **) malloc(v * sizeof(struct node *));
+  graph->a_list = (struct node **) malloc(MAX_NODES * sizeof(struct node *));
+  graph->visited =(int*) malloc(MAX_NODES * sizeof(int*));
+  graph->queue = (int*) malloc(MAX_NODES * sizeof(int*));
+  graph->tier1 = (int*) malloc(MAX_NODES * sizeof(int*));
+  graph->curr_path = (int*) malloc(MAX_NODES * sizeof(int*));
 
-  graph->visited =(int*) malloc(v * sizeof(int*));
-  graph->queue = (int*) malloc(v * sizeof(int*));
-  graph->tier1 = (int*) malloc(v * sizeof(int*));
-  graph->curr_path = (int*) malloc(v * sizeof(int*));
-
-  for(int i=0; i < v ; ++i )
+  for(int i = 0; i < MAX_NODES ; ++i )
   {
     graph->visited[i] = 0;
     graph->a_list[i] = NULL;
@@ -55,6 +74,7 @@ void addEdge(struct Graph* graph, int src, int dest, int type){
     struct node* source;
     struct node* desti;
     struct node* temp;
+
     if(type == 1){
       source = createNode(src, 1);
       desti = createNode(dest, 3);
@@ -95,7 +115,7 @@ void addEdge(struct Graph* graph, int src, int dest, int type){
 void printGraph(struct Graph* graph)
 {
   struct node* temp;
-  for (int i = 0; i <= MAX_NODES; i++){
+  for (int i = 1; i < MAX_NODES; i++){
     temp = graph->a_list[i];
     if(temp != NULL){
       printf("%d ->"      , i);
@@ -108,7 +128,7 @@ void printGraph(struct Graph* graph)
   }
 }
 
-struct Graph* BFS(struct Graph* graph_, int size){
+struct Graph* BFS(struct Graph* graph_){
 
   int flag = 0;
   int id_visited = 0;
@@ -116,7 +136,7 @@ struct Graph* BFS(struct Graph* graph_, int size){
   struct Graph* graph = graph_;
   struct node* temp = graph->a_list[0];
 
-  for(int i = 0; i <= size; i++)
+  for(int i = 1; i < MAX_NODES; i++)
   {
     if(graph->a_list[i] != NULL){
       push_queue(graph, graph->a_list[i]->name);
@@ -133,7 +153,7 @@ struct Graph* BFS(struct Graph* graph_, int size){
     flag = 0;
     while(temp)
     {
-      for(int i = 0; i <= size; i++)
+      for(int i = 1; i < MAX_NODES; i++)
       {
         if(temp->name == graph->queue[i]){
           flag = -1;
@@ -155,15 +175,15 @@ struct Graph* BFS(struct Graph* graph_, int size){
   return graph;
 }
 
-int connected(struct Graph* graph, int size ) {
+int connected(struct Graph* graph) {
   //pick node from graph
   int n_nos = 0;
 
-  graph = BFS(graph, size);
+  graph = BFS(graph);
 
   int gc = 0;
 
-  for(int i = 1; i <= size; i++){
+  for(int i = 1; i < MAX_NODES; i++){
     if(graph->visited[i]==1)
       n_nos++;
     if( n_nos == graph->num_V){
@@ -175,7 +195,7 @@ int connected(struct Graph* graph, int size ) {
   return gc;
 }
 
-int findTier1(struct Graph * graph, int size)
+int findTier1(struct Graph * graph)
 {
   struct node* temp;
   int count = 0;
@@ -183,11 +203,11 @@ int findTier1(struct Graph * graph, int size)
   int n_of_peers_T1 = 0;
 
   graph->tier1[0] = -2;
-  for(int i = 1; i<= size; i++){
+  for(int i = 1; i < MAX_NODES; i++){
     graph->tier1[i] = -1;
   }
 
-    for (int i = 0; i <= size; i++){
+    for (int i = 1; i < MAX_NODES; i++){
       if(count == graph->num_V)
         break;
       if(graph->a_list[i] == NULL){
@@ -211,14 +231,14 @@ int findTier1(struct Graph * graph, int size)
     }
 }
 
-int CommerciallyConn(struct Graph* graph, int size)
+int CommerciallyConn(struct Graph* graph)
 {
   struct node* temp;
   int flag = 0;
   int peert1 = 0;
   int tier1 = 0;
 
-  for(int i = 1; i <= size; i++){
+  for(int i = 1; i < MAX_NODES; i++){
     if(graph->tier1[i] == 1){
       temp = graph->a_list[i];
       while(temp){
@@ -287,13 +307,12 @@ int DFS_cycles(struct Graph* graph, int v, int discovered[], int curr, int stack
 
   temp = graph->a_list[v];
   while(temp){
-    if(discovered[temp->name] == 1 && temp->type == 3 && graph->curr_path[temp->name] == 1){
+    if(temp->type == 3 && graph->curr_path[temp->name] == 1){
       printf("The internet is not commercially acyclic\nCycle: ");
-
       for(i = 0; i < MAX_NODES; i++){
         if(stack[i] == temp->name)
           break;
-        }
+      }
       for(j = i; j < MAX_NODES; j++){
         if(stack[j] != 0){
           printf("%d ", stack[j]);
@@ -301,11 +320,11 @@ int DFS_cycles(struct Graph* graph, int v, int discovered[], int curr, int stack
         else
           break;
       }
+      printf("\n");
       cycle = 1;
       return cycle;
     }
     if(discovered[temp->name] == 0 && temp->type == 3){
-      printf("discovering %d\n", temp->name);
       cycle = DFS_cycles(graph, temp->name, discovered, curr, stack);
       if(cycle == 1)
         return 1;
@@ -319,7 +338,7 @@ int DFS_cycles(struct Graph* graph, int v, int discovered[], int curr, int stack
 }
 
 void checkCycles(struct Graph* graph){
-  struct node* temp;
+
   int discovered[MAX_NODES];
   int stack[MAX_NODES];
   int curr = 0;
@@ -329,11 +348,12 @@ void checkCycles(struct Graph* graph){
   for(i = 0; i < MAX_NODES; i++){
     discovered[i] = 0;
     stack[i] = 0;
+    graph->curr_path[i] = 0;
   }
 
-  findTier1(graph, MAX_NODES);
+  findTier1(graph);
 
-  for(i = 0; i < MAX_NODES; i++){
+  for(i = 1; i < MAX_NODES; i++){
     if(graph->tier1[i] == 1){
       if(discovered[i] == 0)
         cycle = DFS_cycles(graph, i, discovered, curr, stack);
