@@ -218,8 +218,6 @@ int CommerciallyConn(struct Graph* graph, int size)
   int peert1 = 0;
   int tier1 = 0;
 
-  printf("num for tier1 %d\n", tier1);
-
   for(int i = 1; i <= size; i++){
     if(graph->tier1[i] == 1){
       temp = graph->a_list[i];
@@ -230,7 +228,6 @@ int CommerciallyConn(struct Graph* graph, int size)
         temp = temp->next;
       }
       if(graph->n_tier1 - 1 != peert1){
-        printf("tier %d\n", i);
         flag = -1;
         break;
       }
@@ -279,21 +276,37 @@ int pop_queue( struct Graph* graph )
   return item;
 }
 
-int DFS(struct Graph* graph, int v, int discovered[]){
+int DFS_cycles(struct Graph* graph, int v, int discovered[], int curr, int stack[]){
   struct node* temp;
-  int cycle = 0, i;
+  int cycle = 0, i = 0, j = 0;
 
   discovered[v] = 1;
   graph->curr_path[v] = 1;
+  stack[curr] = v;
+  curr++;
 
   temp = graph->a_list[v];
   while(temp){
     if(discovered[temp->name] == 1 && temp->type == 3 && graph->curr_path[temp->name] == 1){
+      printf("The internet is not commercially acyclic\nCycle: ");
+
+      for(i = 0; i < MAX_NODES; i++){
+        if(stack[i] == temp->name)
+          break;
+        }
+      for(j = i; j < MAX_NODES; j++){
+        if(stack[j] != 0){
+          printf("%d ", stack[j]);
+        }
+        else
+          break;
+      }
       cycle = 1;
       return cycle;
     }
     if(discovered[temp->name] == 0 && temp->type == 3){
-      cycle = DFS(graph, temp->name, discovered);
+      printf("discovering %d\n", temp->name);
+      cycle = DFS_cycles(graph, temp->name, discovered, curr, stack);
       if(cycle == 1)
         return 1;
     }
@@ -305,14 +318,17 @@ int DFS(struct Graph* graph, int v, int discovered[]){
   return cycle;
 }
 
-int checkCycles(struct Graph* graph){
+void checkCycles(struct Graph* graph){
   struct node* temp;
   int discovered[MAX_NODES];
+  int stack[MAX_NODES];
+  int curr = 0;
   int cycle = 0;
   int i;
 
   for(i = 0; i < MAX_NODES; i++){
     discovered[i] = 0;
+    stack[i] = 0;
   }
 
   findTier1(graph, MAX_NODES);
@@ -320,9 +336,10 @@ int checkCycles(struct Graph* graph){
   for(i = 0; i < MAX_NODES; i++){
     if(graph->tier1[i] == 1){
       if(discovered[i] == 0)
-        cycle = DFS(graph, i, discovered);
+        cycle = DFS_cycles(graph, i, discovered, curr, stack);
     }
   }
 
-  return cycle;
+  if(cycle == 0)
+    printf("The internet is commercially acyclic\n");
 }

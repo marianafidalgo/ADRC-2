@@ -49,14 +49,7 @@ int main(int argc, char **argv) {
         //algorithm 2
     }
     else if(algorithm == 3){
-        printf("nodes %d\n", graph->num_V);
-        int result3 = 0;
-
-        result3 = checkCycles(graph);
-        if(result3 == 1)
-            printf("The internet is not commercially acyclic\n");
-        else
-            printf("The internet is commercially acyclic\n");
+        checkCycles(graph);
     }
     else if(algorithm == 4){
         int result4 = 1;

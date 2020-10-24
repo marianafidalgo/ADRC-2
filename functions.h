@@ -39,8 +39,8 @@ int CommerciallyConn(struct Graph* graph, int size);
 struct Graph* BFS(struct Graph* graph, int size);
 int pop_queue(struct Graph* graph);
 int push_queue(struct Graph* graph, int a);
-int DFS(struct Graph* graph, int v, int discovered[]);
-int checkCycles(struct Graph* graph);
+int DFS_cycles(struct Graph* graph, int v, int discovered[], int curr, int stack[]);
+void checkCycles(struct Graph* graph);
 
 //name funct BFS
 // name funct CONNECTED
