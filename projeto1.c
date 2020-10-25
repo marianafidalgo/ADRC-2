@@ -11,7 +11,6 @@ int main(int argc, char **argv) {
     int type, src, dest = 0;
     int option = 0;
     struct Graph * graph = createGraph();
-    struct node * temp;
 
     internet = fopen(argv[1], "r");
     if (internet == NULL)
@@ -33,38 +32,25 @@ int main(int argc, char **argv) {
             "6. Exit\n\n");
         scanf("%d", &option);
 
-        if(option == 1){
+        if(option == 1)
+            connected(graph);
 
-            int result = 0;
-
-            result = connected(graph);
-
-            if(result == 1)
-                printf("The internet is connected\n");
-            else
-                printf("The internet is not connected\n");
-
-        }
         else if(option == 2){
             //algorithm 2
         }
-        else if(option == 3){
+        else if(option == 3)
             checkCycles(graph);
-        }
+
         else if(option == 4){
-            int result4 = 1;
+
             if(graph->tier1[0] != -2)
                 findTier1(graph);
-            result4 = CommerciallyConn(graph);
 
-            if(result4 == -1)
-                printf("The internet is not commercially connected\n");
-            else
-                printf("The internet is commercially connected\n");
+            CommerciallyConn(graph);
         }
-        else if(option == 5){
+        else if(option == 5)
             printGraph(graph);
-        }
+
         else if(option == 6){
             fclose(internet);
             freeAll(graph);
