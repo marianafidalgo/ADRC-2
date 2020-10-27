@@ -120,6 +120,7 @@ void printGraph(struct Graph* graph)
       printf("\n");
     }
   }
+  printf("Number of nodes: %d\n", (graph->num_V));
 }
 
 struct Graph* BFS(struct Graph* graph_){
