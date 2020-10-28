@@ -12,6 +12,7 @@ int main(int argc, char **argv) {
     int option, len = 0;
     char * fileNameIn;
     struct Graph * graph = createGraph();
+    struct Queue * queue = createQueue();
 
     /* Checks number of arguments */
     if(argc < 2){
@@ -46,10 +47,8 @@ int main(int argc, char **argv) {
                 "6. Exit\n\n");
             scanf("%d", &option);
 
-            if(option == 1){
-                struct Queue * queue = createQueue();
+            if(option == 1)
                 connected(graph, queue);
-            }
 
             else if(option == 2){
                 //algorithm 2

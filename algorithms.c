@@ -28,7 +28,7 @@ struct Graph* createGraph() {
   graph->visited =(int*) malloc(MAX_NODES * sizeof(int*));
   graph->tier1 = (int*) malloc(MAX_NODES * sizeof(int*));
 
-  for(int i = 0; i < MAX_NODES ; ++i )
+  for(int i = 0; i < MAX_NODES ; i++ )
   {
     graph->visited[i] = 0;
     graph->a_list[i] = NULL;
@@ -369,9 +369,9 @@ void freeAll(struct Graph* graph, struct Queue * queue){
   }
 
   free(graph->visited);
-  free(queue->array);
   free(graph->tier1);
   free(graph->a_list);
-  free(queue);
   free(graph);
+  free(queue->array);
+  free(queue);
 }
