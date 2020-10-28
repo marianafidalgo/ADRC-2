@@ -375,3 +375,82 @@ void freeAll(struct Graph* graph, struct Queue * queue){
   free(queue);
   free(graph);
 }
+
+// A recursive function that finds and prints bridges using 
+// DFS traversal 
+// u --> The vertex to be visited next 
+// visited[] --> keeps tract of visited vertices 
+// disc[] --> Stores discovery times of visited vertices 
+// parent[] --> Stores parent vertices in DFS tree 
+/*void bridges(struct Graph* graph, int u, int  visited[], int disc[], int l[], int pred[]){ 
+    int time = 0;
+    struct node* temp; 
+  
+    // Mark the current node as visited 
+    visited[u] = 1; 
+  
+    // Initialize discovery time and low value 
+    time= time+1;
+    disc[u]= time;
+    l[u]= time; 
+
+    temp=graph->a_list[u];
+  
+    // Go through all vertices aadjacent to this 
+    //for (i = adj[u].begin(); i != adj[u].end(); ++i) 
+    while(temp!=NULL)
+    { 
+        int v = temp->name;  // v is current adjacent of u 
+  
+        // If v is not visited yet, then recur for it 
+        if (visited[v]!=1 && temp->type!=3) 
+        { 
+            pred[v] = u; 
+            bridges(graph, v, visited, disc, l, pred); 
+  
+            // Check if the subtree rooted with v has a  
+            // connection to one of the ancestors of u 
+            l[u]  = min(l[u], l[v]); 
+  
+            // If the lowest vertex reachable from subtree  
+            // under v is  below u in DFS tree, then u-v  
+            // is a bridge 
+            if (l[v] > disc[u]) 
+                printf("There is a bridge %d-%d|", u,v);
+                //exit(0); //arranjar outra forma de pôr isto, tipo com uma flag, só para ele parar assim que encontrar 1 ponte
+        } 
+        else if (v != pred[u])  // Update low value of u for parent function calls. 
+            l[u]  = min(l[u], disc[v]); 
+        
+        temp=temp->next;
+    } 
+    return ;
+} */
+  
+// DFS based function to find all bridges. It uses recursive  
+// function bridgeUtil() 
+/*void find_bridges(struct Graph* graph){ 
+
+    int visited[MAX_NODES]; //graph->num_V , ver se é melhor só criar vetores com este tamanho
+    int disc[MAX_NODES]; 
+    int l[MAX_NODES]; 
+    int pred[MAX_NODES];
+    int i=0;
+
+    // Initialize predecessor and visited arrays 
+    for (i = 0; i < MAX_NODES; i++){ 
+        pred[i] = 0; 
+        visited[i] = 0; 
+    } 
+
+    // Call the recursive function to find Bridges 
+    // in DFS tree rooted in vertex 'i' 
+    for(i = 1; i < MAX_NODES; i++){
+        if(graph->visited[i] == 0)
+            bridges(graph, i, visited, disc, l, pred);
+        //graph->visited[i] = 0;
+    }
+
+    printf("The interned is link-biconnected!\n");
+
+} */

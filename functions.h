@@ -2,6 +2,7 @@
 #define FUNC_H
 
 #define MAX_NODES 65536
+#define min(A,B) ((A)<=(B)?(A):(B))
 
 struct node {
   int name;
@@ -43,6 +44,10 @@ int push_queue(struct Queue* queue, int a);
 int DFS_cycles(struct Graph* graph, int v, int curr, int curr_path[], int stack[]);
 void checkCycles(struct Graph* graph);
 void freeAll(struct Graph* graph, struct Queue * queue);
+
+void bridges(struct Graph* graph, int u, int  visited[], int disc[], int l[], int pred[]);
+void find_bridges(struct Graph* graph);
+
 
 //name funct BFS
 // name funct CONNECTED

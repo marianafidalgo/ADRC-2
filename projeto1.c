@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
             }
 
             else if(option == 2){
-                //algorithm 2
+                //find_bridges(graph);
             }
             else if(option == 3)
                 checkCycles(graph);
