@@ -20,11 +20,11 @@ int main(int argc, char **argv) {
     }
 
     fileNameIn = argv[1];
-    
+
     len= strlen(argv[1]);
     /*checks if the extension of the file is correct*/
     if(fileNameIn[len-1] == 't' && fileNameIn[len-2] == 'x' && fileNameIn[len-3]== 't' && fileNameIn[len-4]== '.')
-    {    
+    {
 
         internet = fopen(argv[1], "r");
         if (internet == NULL)
@@ -46,8 +46,10 @@ int main(int argc, char **argv) {
                 "6. Exit\n\n");
             scanf("%d", &option);
 
-            if(option == 1)
-                connected(graph);
+            if(option == 1){
+                struct Queue * queue = createQueue();
+                connected(graph, queue);
+            }
 
             else if(option == 2){
                 //algorithm 2
@@ -63,7 +65,7 @@ int main(int argc, char **argv) {
 
             else if(option == 6){
                 fclose(internet);
-                freeAll(graph);
+                freeAll(graph, queue);
                 exit(0);
             }
 

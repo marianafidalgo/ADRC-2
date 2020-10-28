@@ -3,23 +3,6 @@
 #include <string.h>
 #include "functions.h"
 
-void freeAll(struct Graph* graph){
-  struct node * temp;
-
-  for (int i = 0; i < MAX_NODES; i++){
-    while(graph->a_list[i] != NULL){
-      temp = graph->a_list[i];
-      graph->a_list[i] = graph->a_list[i]->next;
-      free(temp);
-    }
-  }
-
-  free(graph->visited);
-  free(graph->queue);
-  free(graph->tier1);
-  free(graph->a_list);
-  free(graph);
-}
 int count = 0;
 // Create a new node
 struct node* createNode(int id_node, int type) {
@@ -43,22 +26,37 @@ struct Graph* createGraph() {
 // Create vertical array of nodes (size v)
   graph->a_list = (struct node **) malloc(MAX_NODES * sizeof(struct node *));
   graph->visited =(int*) malloc(MAX_NODES * sizeof(int*));
-  graph->queue = (int*) malloc(MAX_NODES * sizeof(int*));
   graph->tier1 = (int*) malloc(MAX_NODES * sizeof(int*));
 
   for(int i = 0; i < MAX_NODES ; ++i )
   {
     graph->visited[i] = 0;
     graph->a_list[i] = NULL;
-    graph->queue[i] = 0;
     graph->tier1[i] = 0;
   }
 
-  graph->count = 0;
-  graph->head = 0;
-  graph->tail = 0;
-
   return graph;
+}
+
+// Create a queue for BFS algorithm
+struct Queue* createQueue() {
+
+  struct Queue* queue = malloc(sizeof(struct Graph));
+
+// Create vertical array of nodes (size v)
+
+  queue->array = (int*) malloc(MAX_NODES * sizeof(int*));
+
+  for(int i = 0; i < MAX_NODES ; ++i )
+  {
+    queue->array[i] = 0;
+  }
+
+  queue->count = 0;
+  queue->head = 0;
+  queue->tail = 0;
+
+  return queue;
 }
 
 /* Adds an edge to a graph*/
@@ -123,7 +121,7 @@ void printGraph(struct Graph* graph)
   printf("Number of nodes: %d\n", (graph->num_V));
 }
 
-struct Graph* BFS(struct Graph* graph_){
+struct Graph* BFS(struct Graph* graph_, struct Queue * queue){
 
   int flag = 0;
   int id_visited = 0;
@@ -134,13 +132,13 @@ struct Graph* BFS(struct Graph* graph_){
   for(int i = 1; i < MAX_NODES; i++)
   {
     if(graph->a_list[i] != NULL){
-      push_queue(graph, graph->a_list[i]->name);
+      push_queue(queue, graph->a_list[i]->name);
       break;
     }
   }
 
-  while (graph->count != 0){
-    int id_pop = pop_queue(graph);
+  while (queue->count != 0){
+    int id_pop = pop_queue(queue);
     graph->visited[id_pop] = 1;
 
     temp = graph->a_list[id_pop];
@@ -150,17 +148,17 @@ struct Graph* BFS(struct Graph* graph_){
     {
       for(int i = 1; i < MAX_NODES; i++)
       {
-        if(temp->name == graph->queue[i]){
+        if(temp->name == queue->array[i]){
           flag = -1;
           break;
         }
 
-        if(graph->queue[i] == 0)
+        if(queue->array[i] == 0)
           break;
       }
 
       if(flag == 0){
-        push_queue(graph, temp->name);
+        push_queue(queue, temp->name);
       }
       flag = 0;
       temp = temp->next;
@@ -170,12 +168,12 @@ struct Graph* BFS(struct Graph* graph_){
   return graph;
 }
 
-void connected(struct Graph* graph) {
+void connected(struct Graph* graph, struct Queue * queue) {
   //pick node from graph
   int n_nos = 0;
   int gc = 0;
 
-  graph = BFS(graph);
+  graph = BFS(graph, queue);
 
   for(int i = 1; i < MAX_NODES; i++){
     if(graph->visited[i]==1)
@@ -185,10 +183,10 @@ void connected(struct Graph* graph) {
       break;
     }
     graph->visited[i]==0;
-    graph->queue[i] = 0;
+    queue->array[i] = 0;
   }
-  graph->head=0;
-  graph->tail=0;
+  queue->head=0;
+  queue->tail=0;
 
   if(gc == 1)
     printf("The internet is connected\n");
@@ -267,25 +265,25 @@ void CommerciallyConn(struct Graph * graph)
 
 }
 
-int push_queue(struct Graph* graph, int new_id )
+int push_queue(struct Queue* queue, int new_id )
 {
-    graph->queue[graph->tail] = new_id;
-    graph->count++;
-    graph->tail++;
+    queue->array[queue->tail] = new_id;
+    queue->count++;
+    queue->tail++;
 }
 
-int pop_queue( struct Graph* graph )
+int pop_queue( struct Queue* queue )
 {
   int item = -1;
 
-  item = graph->queue[graph->head];
-  graph->head++;
-  if(graph->head > graph->tail)
+  item = queue->array[queue->head];
+  queue->head++;
+  if(queue->head > queue->tail)
   {
     //reset queue
-    graph->head = graph->tail = 0;
+    queue->head = queue->tail = 0;
   }
-  graph->count--;
+  queue->count--;
 
   return item;
 }
@@ -353,7 +351,27 @@ void checkCycles(struct Graph* graph){
     }
     graph->visited[i] = 0;
   }
-  
+
   if(cycle == 0)
     printf("The internet is commercially acyclic\n");
+}
+
+void freeAll(struct Graph* graph, struct Queue * queue){
+
+  struct node * temp;
+
+  for (int i = 0; i < MAX_NODES; i++){
+    while(graph->a_list[i] != NULL){
+      temp = graph->a_list[i];
+      graph->a_list[i] = graph->a_list[i]->next;
+      free(temp);
+    }
+  }
+
+  free(graph->visited);
+  free(queue->array);
+  free(graph->tier1);
+  free(graph->a_list);
+  free(queue);
+  free(graph);
 }
