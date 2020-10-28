@@ -45,7 +45,7 @@ int DFS_cycles(struct Graph* graph, int v, int curr, int curr_path[], int stack[
 void checkCycles(struct Graph* graph);
 void freeAll(struct Graph* graph, struct Queue * queue);
 
-void bridges(struct Graph* graph, int u, int  visited[], int disc[], int l[], int pred[]);
+int bridges(struct Graph* graph, int u, int  visited[], int disc[], int l[], int pred[],int *time);
 void find_bridges(struct Graph* graph);
 
 
