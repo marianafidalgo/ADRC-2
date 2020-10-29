@@ -380,13 +380,13 @@ void freeAll(struct Graph* graph, struct Queue * queue){
 
 // A recursive function that finds and prints bridges using 
 // DFS traversal 
-int bridges(struct Graph* graph, int u, int  visited[], int disc[], int l[], int pred[],int* time,int* bi){ 
+int bridges(struct Graph* graph, int u, int disc[], int l[], int pred[],int* time,int* bi){ 
     
     struct node* temp; 
     //int bi=0;
   
     // Mark the current node as visited 
-    visited[u] = 1; 
+    graph->visited[u] = 1; 
   
     // Initialize discovery time and low value 
     *time= *time+1;
@@ -402,11 +402,11 @@ int bridges(struct Graph* graph, int u, int  visited[], int disc[], int l[], int
         int v = temp->name;  // v is current adjacent of u 
 
         // If v is not visited yet, then recur for it 
-        if (visited[v]!=1) // && temp->type!=1) 
+        if (graph->visited[v]!=1) // && temp->type!=1) 
         { 
             //printf("%d was not visited and is not type 1\n",v);
             pred[v] = u; 
-            bridges(graph, v, visited, disc, l, pred, time,bi);            
+            bridges(graph, v, disc, l, pred, time,bi);            
   
             // Check if the subtree rooted with v has a  
             // connection to one of the ancestors of u 
@@ -440,7 +440,7 @@ int bridges(struct Graph* graph, int u, int  visited[], int disc[], int l[], int
 // function bridges()
 void find_bridges(struct Graph* graph){ 
 
-    int visited[MAX_NODES]; //stores if a node has already been visited or not
+    //int visited[MAX_NODES]; //stores if a node has already been visited or not
     int disc[MAX_NODES]; //stores the discovery time of each node
     int l[MAX_NODES];  //stores the latest time of a node it can reach
     int pred[MAX_NODES]; //stores the predecessor of each node
@@ -449,7 +449,7 @@ void find_bridges(struct Graph* graph){
     // Initialize predecessor and visited arrays 
     for (i = 0; i < MAX_NODES; i++){ 
         pred[i] = 0; 
-        visited[i] = 0; 
+        graph->visited[i] = 0; 
         disc[i]=0;
         l[i]=0;
     } 
@@ -458,8 +458,8 @@ void find_bridges(struct Graph* graph){
     // in DFS tree rooted in vertex 'i' 
     for(i = 1; i < MAX_NODES; i++){
         if(graph->visited[i] == 0)
-            bridges(graph, i, visited, disc, l, pred,&time, &bi);
-        //graph->visited[i] = 0;
+            bridges(graph, i, disc, l, pred,&time, &bi);
+        graph->visited[i] = 0; //to clear the vector of visited nodes
     }
     if(bi!=1)
       printf("The interned is link-biconnected!\n");
