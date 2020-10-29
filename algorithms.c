@@ -400,15 +400,13 @@ int bridges(struct Graph* graph, int u, int  visited[], int disc[], int l[], int
     {   
         
         int v = temp->name;  // v is current adjacent of u 
-        printf(" u:l[%d]=%d and v:l[%d]=%d \t time=%d bi=%d\n",u,l[u],v,l[v],*time, *bi);
 
         // If v is not visited yet, then recur for it 
         if (visited[v]!=1) // && temp->type!=1) 
         { 
             //printf("%d was not visited and is not type 1\n",v);
             pred[v] = u; 
-            bridges(graph, v, visited, disc, l, pred, time,bi); 
-            printf("retirei %d \t u:l[%d]=%d and v:l[%d]=%d \t and bi=%d\n\n",v ,u,l[u],v,l[v],*bi);            
+            bridges(graph, v, visited, disc, l, pred, time,bi);            
   
             // Check if the subtree rooted with v has a  
             // connection to one of the ancestors of u 

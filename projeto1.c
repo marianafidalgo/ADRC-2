@@ -28,8 +28,10 @@ int main(int argc, char **argv) {
     {
 
         internet = fopen(argv[1], "r");
-        if (internet == NULL)
+        if (internet == NULL){
+            printf("The file not found in this directory\n");
             exit(EXIT_FAILURE);
+        }
 
         while (fscanf(internet, "%d %d %d", &src, &dest, &type) == 3){
         if (type == 1 || type == 2)
