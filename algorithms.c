@@ -378,67 +378,67 @@ void freeAll(struct Graph* graph, struct Queue * queue){
 
 
 
-// A recursive function that finds and prints bridges using 
-// DFS traversal 
-int bridges(struct Graph* graph, int u, int  visited[], int disc[], int l[], int pred[],int* time,int* bi){ 
-    
-    struct node* temp; 
+// A recursive function that finds and prints bridges using
+// DFS traversal
+int bridges(struct Graph* graph, int u, int  visited[], int disc[], int l[], int pred[],int* time,int* bi){
+
+    struct node* temp;
     //int bi=0;
-  
-    // Mark the current node as visited 
-    visited[u] = 1; 
-  
-    // Initialize discovery time and low value 
+
+    // Mark the current node as visited
+    visited[u] = 1;
+
+    // Initialize discovery time and low value
     *time= *time+1;
     disc[u]= *time;
-    l[u]= *time; 
+    l[u]= *time;
 
     temp=graph->a_list[u];
 
     // Go through all vertices adjacent nodes
     while(temp!=NULL)
-    {   
-        
-        int v = temp->name;  // v is current adjacent of u 
+    {
 
-        // If v is not visited yet, then recur for it 
-        if (visited[v]!=1) // && temp->type!=1) 
-        { 
+        int v = temp->name;  // v is current adjacent of u
+
+        // If v is not visited yet, then recur for it
+        if (visited[v]!=1) // && temp->type!=1)
+        {
             //printf("%d was not visited and is not type 1\n",v);
-            pred[v] = u; 
-            bridges(graph, v, visited, disc, l, pred, time,bi);            
-  
-            // Check if the subtree rooted with v has a  
-            // connection to one of the ancestors of u 
-            l[u]  = min(l[u], l[v]); //i.e., if v can reach a previous node then so can u 
-  
-            // If the lowest vertex reachable from subtree  
-            // under v is  below u in DFS tree, then u-v  
-            // is a bridge 
+            pred[v] = u;
+            bridges(graph, v, visited, disc, l, pred, time,bi);
+
+            // Check if the subtree rooted with v has a
+            // connection to one of the ancestors of u
+            l[u]  = min(l[u], l[v]); //i.e., if v can reach a previous node then so can u
+
+            // If the lowest vertex reachable from subtree
+            // under v is  below u in DFS tree, then u-v
+            // is a bridge
 
             //se o nó mais antigo a que o v consegue aceder
             //for maior que o disc do u,
             //isso quer dizer que o v fica isolado caso se corte u-v
             //ou seja, temos uma ponte
-            if (l[v] > disc[u]){ 
+            if (l[v] > disc[u]){
                 printf("There is a bridge %d-%d\n", u,v);
                 *bi=1;
                 return 1; // so it stops once it finds 1 bridge
             }
-        } 
+        }
         else if (v != pred[u])  // If v is not the predecessor of u
-            l[u]  = min(l[u], disc[v]);  //it means u can reach a previous node 
+            l[u]  = min(l[u], disc[v]);  //it means u can reach a previous node
         if(*bi==1){
           break;
-        } 
+        }
         temp=temp->next;
-    } 
+    }
     return 0;
 }
-  
-// DFS based function to find all bridges. It uses recursive  
+
+// DFS based function to find all bridges. It uses recursive
 // function bridges()
-void find_bridges(struct Graph* graph){ 
+void find_bridges(struct Graph* graph){
 
     int visited[MAX_NODES]; //stores if a node has already been visited or not
     int disc[MAX_NODES]; //stores the discovery time of each node
@@ -446,16 +446,16 @@ void find_bridges(struct Graph* graph){
     int pred[MAX_NODES]; //stores the predecessor of each node
     int i=0, time=0 ,bi=0;
 
-    // Initialize predecessor and visited arrays 
-    for (i = 0; i < MAX_NODES; i++){ 
-        pred[i] = 0; 
-        visited[i] = 0; 
+    // Initialize predecessor and visited arrays
+    for (i = 0; i < MAX_NODES; i++){
+        pred[i] = 0;
+        visited[i] = 0;
         disc[i]=0;
         l[i]=0;
-    } 
+    }
 
-    // Call the recursive function to find Bridges 
-    // in DFS tree rooted in vertex 'i' 
+    // Call the recursive function to find Bridges
+    // in DFS tree rooted in vertex 'i'
     for(i = 1; i < MAX_NODES; i++){
         if(graph->visited[i] == 0)
             bridges(graph, i, visited, disc, l, pred,&time, &bi);
