@@ -16,13 +16,13 @@ struct Graph {
     int num_V; // number of nodes
     struct node ** a_list; //adjacency list
     int * visited; //stores visited nodes
-    int * tier1; //stores tier-1 nodes
-    int n_tier1;
+    int * tier1; //stores tier 1 nodes
+    int n_tier1; //number of tier 1 nodes
 };
 
 struct Queue {
   int * array; //stores sons of visited nodes
-  size_t count; //n_items in queue
+  size_t count; //number of items in queue
   size_t head; //location to pop from
   size_t tail;  //location to push from
 };
@@ -38,18 +38,15 @@ void printGraph(struct Graph* graph);
 void connected(struct Graph* graph, struct Queue * queue);
 int findTier1(struct Graph* graph);
 void CommerciallyConn(struct Graph* graph);
-struct Graph* BFS(struct Graph* graph, struct Queue * queue);
+void BFS(struct Graph* graph, struct Queue * queue);
 int pop_queue(struct Queue* queue);
 int push_queue(struct Queue* queue, int a);
 int DFS_cycles(struct Graph* graph, int v, int curr, int curr_path[], int stack[]);
 void checkCycles(struct Graph* graph);
 void freeAll(struct Graph* graph, struct Queue * queue);
 
-int bridges(struct Graph* graph, int u, int  visited[], int disc[], int l[], int pred[],int *time,int* bi);
+void DFSbridges(struct Graph* graph, int u, int disc[], int l[], int pred[],int *time,int* bi);
 void find_bridges(struct Graph* graph);
 
-
-//name funct BFS
-// name funct CONNECTED
 
 #endif
