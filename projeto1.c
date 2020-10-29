@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
     struct Graph * graph = createGraph();
     struct Queue * queue = createQueue();
 
-    /* Checks number of arguments */
+    //Checks number of arguments
     if(argc < 2){
         printf("There are arguments missing.You must insert the name of a text file.\n");
         exit(0);
@@ -23,16 +23,16 @@ int main(int argc, char **argv) {
     fileNameIn = argv[1];
 
     len= strlen(argv[1]);
-    /*checks if the extension of the file is correct*/
+    //Checks if the extension of the file is correct
     if(fileNameIn[len-1] == 't' && fileNameIn[len-2] == 'x' && fileNameIn[len-3]== 't' && fileNameIn[len-4]== '.')
     {
-
+        //open file
         internet = fopen(argv[1], "r");
         if (internet == NULL){
-            printf("The file not found in this directory\n");
+            printf("File not found in this directory\n");
             exit(EXIT_FAILURE);
         }
-
+        //retrieves the data from each line
         while (fscanf(internet, "%d %d %d", &src, &dest, &type) == 3){
         if (type == 1 || type == 2)
             addEdge(graph, src, dest, type);
@@ -47,6 +47,7 @@ int main(int argc, char **argv) {
                 "4. Check if internet is commercially connected\n"
                 "5. Print adjacency list\n"
                 "6. Exit\n\n");
+            //retrieves option chose
             scanf("%d", &option);
 
             if(option == 1)
