@@ -450,11 +450,11 @@ void DFSbridges(struct Graph* graph, int u, int disc[], int l[], int pred[],int*
     while(temp != NULL){   
         
         int v = temp->name;  // v is current adjacent of u 
-
-        // If v is not visited yet, then recur for it 
+        
         if (graph->visited[v]!=1){
 
             pred[v] = u; 
+            printf("\t time=%d \t u:l[%d]=%d    v:l[%d]=%d \n",*time, u,l[u],v,l[v]);
             DFSbridges(graph, v, disc, l, pred, time,bi);            
   
             // Check if the subtree rooted with v has a  
@@ -464,14 +464,10 @@ void DFSbridges(struct Graph* graph, int u, int disc[], int l[], int pred[],int*
             // If the lowest vertex reachable from subtree  
             // under v is  below u in DFS tree, then u-v  
             // is a bridge 
-
-            //se o nó mais antigo a que o v consegue aceder
-            //for maior que o disc do u,
-            //isso quer dizer que o v fica isolado caso se corte u-v
-            //ou seja, temos uma ponte
             if (l[v] > disc[u]){ 
-                if(*bi==1)
+                if(*bi==1){
                   return ; // so it stops once it finds 1 bridge
+                }
                 else{
                   printf("There is a bridge %d-%d\n", u,v);
                   *bi = 1;
@@ -498,7 +494,6 @@ void DFSbridges(struct Graph* graph, int u, int disc[], int l[], int pred[],int*
  **************************************************************************/
 void find_bridges(struct Graph * graph){ 
 
-    //int visited[MAX_NODES]; //stores if a node has already been visited or not
     int disc[MAX_NODES]; //stores the discovery time of each node
     int l[MAX_NODES];  //stores the latest time of a node it can reach
     int pred[MAX_NODES]; //stores the predecessor of each node
@@ -507,7 +502,6 @@ void find_bridges(struct Graph * graph){
     // Initialize predecessor and visited arrays 
     for (i = 0; i < MAX_NODES; i++){ 
         pred[i] = 0; 
-        graph->visited[i] = 0; 
         disc[i]=0;
         l[i]=0;
     } 
@@ -520,7 +514,7 @@ void find_bridges(struct Graph * graph){
         graph->visited[i] = 0; //to clear the vector of visited nodes
     }
     if(bi!= 1)
-      printf("The interned is link-biconnected!\n");
+      printf("The interned is link-biconnected\n");
 }
 
 /***************************************************************************

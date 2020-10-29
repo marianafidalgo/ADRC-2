@@ -53,9 +53,9 @@ int main(int argc, char **argv) {
             if(option == 1)
                 connected(graph, queue);
 
-            else if(option == 2){
+            else if(option == 2)
                 find_bridges(graph);
-            }
+            
             else if(option == 3)
                 checkCycles(graph);
 
