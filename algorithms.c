@@ -378,8 +378,8 @@ int DFS_cycles(struct Graph * graph, int v, int curr, int curr_path[], int stack
  **************************************************************************/
 void checkCycles(struct Graph * graph){
 
-  int curr_path[MAX_NODES];
-  int stack[MAX_NODES];
+  int curr_path[MAX_NODES]; //stores nodes in the current path
+  int stack[MAX_NODES]; //stores names of nodes in order of visitation
   int curr = 0;
   int cycle = 0;
   int i;
