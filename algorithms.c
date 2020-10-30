@@ -378,8 +378,8 @@ int pop_queue( struct Queue* queue )
  *     Task: Recursive function that checks all the clients of the node
  *           received and marks them as visited. When it finds a node that
  *           was already visited in that path declares there is a cycle
- *   Output: flag that is 0 if there are no cycles and 1 if there is at
- *           least one cycle
+ *   Output: returns flag that is 0 if there are no cycles and 1 if there is 
+ *           at least one cycle
  **************************************************************************/
 int DFS_cycles(struct Graph * graph, int v, int curr, int curr_path[], int stack[]){
   struct node* temp;
@@ -406,11 +406,10 @@ int DFS_cycles(struct Graph * graph, int v, int curr, int curr_path[], int stack
       }
       //print the cycle
       for(j = i; j < MAX_NODES; j++){
-        if(stack[j] != 0){
-          printf("%d ", stack[j]);
-        }
-        else
+        printf("%d ", stack[j]);
+        if(stack[j] == v){
           break;
+        } 
       }
       printf("\n");
       cycle = 1;
@@ -461,22 +460,25 @@ void checkCycles(struct Graph * graph){
   if(graph->n_tier1 != 0){
     for(i = 1; i < MAX_NODES; i++){
       if(graph->tier1[i] == 1){
-        if(graph->visited[i] == 0)
+        if(graph->visited[i] == 0){
           cycle = DFS_cycles(graph, i, curr, curr_path, stack);
           if(cycle == 1)
             break;
+        }
       }
+      graph->visited[i] = 0;
     }
   }
   //if not runs the DFS from the first node and all unvisited nodes after that
   else{
     for(i = 1; i < MAX_NODES; i++){
-      if(graph->visited[i] == 0)
+      if(graph->visited[i] == 0){
         cycle = DFS_cycles(graph, i, curr, curr_path, stack);
         if(cycle == 1)
           break;
+      }
+      graph->visited[i] = 0;
     }
-    graph->visited[i] = 0;
   }
 
   //cycle = 0 means there are no cycles
