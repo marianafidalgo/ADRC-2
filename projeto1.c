@@ -59,9 +59,14 @@ int main(int argc, char **argv) {
             else if(option == 3)
                 checkCycles(graph);
 
-            else if(option == 4)
-                CommerciallyConn(graph);
-
+            else if(option == 4){
+                if(graph->tier1[0] != -2)
+                    findTier1(graph);
+                if(graph->n_tier1 > 0)
+                    CommerciallyConn(graph);
+                else
+                    NoTier1_CommerciallyConn(graph);   
+            }
             else if(option == 5)
                 printGraph(graph);
 
