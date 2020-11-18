@@ -41,36 +41,34 @@ int main(int argc, char **argv) {
         while(1){
 
             printf("\nChoose the algorithm you want to run:\n"
-                "1. Check if internet is connected\n"
-                "2. Check if internet is link-biconnected\n"
-                "3. Check if internet is commercially acyclic\n"
-                "4. Check if internet is commercially connected\n"
-                "5. Print adjacency list\n"
-                "6. Exit\n\n");
+                "1. Check types\n"
+                "2. Check length\n"
+                "3. 3\n"
+                "4. Print adjacency list\n"
+                "5. Exit\n\n");
             //retrieves option chose
             scanf("%d", &option);
 
-            if(option == 1)
-                connected(graph, queue);
+            if(option == 1){
+                //alg1
+            }
 
-            else if(option == 2)
-                find_bridges(graph);
-
-            else if(option == 3)
-                checkCycles(graph);
-
-            else if(option == 4){
+            else if(option == 2){
                 if(graph->tier1[0] != -2)
                     findTier1(graph);
-                if(graph->n_tier1 > 0)
-                    CommerciallyConn(graph);
-                else
-                    NoTier1_CommerciallyConn(graph);   
+                //if(graph->n_tier1 > 0)
+                check_length(graph, queue);
+                // else
+                //     NoTier1_CommerciallyConn(graph);
             }
-            else if(option == 5)
+
+            else if(option == 3){
+               //alg4
+            }
+            else if(option == 4)
                 printGraph(graph);
 
-            else if(option == 6){
+            else if(option == 5){
                 fclose(internet);
                 freeAll(graph, queue);
                 exit(0);

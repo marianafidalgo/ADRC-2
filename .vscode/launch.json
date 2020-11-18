@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/proj",
-            "args": ["4.txt",
+            "args": ["test.txt",
                 "debug"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
