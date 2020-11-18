@@ -34,8 +34,8 @@ int main(int argc, char **argv) {
         }
         //retrieves the data from each line
         while (fscanf(internet, "%d %d %d", &src, &dest, &type) == 3){
-        if (type == 1 || type == 2)
-            addEdge(graph, src, dest, type);
+            if (type == 1 || type == 2)
+                addEdge(graph, src, dest, type);
         }
 
         while(1){

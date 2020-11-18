@@ -75,102 +75,75 @@ struct Queue* createQueue() {
  **************************************************************************/
 void addEdge(struct Graph* graph, int src, int dest, int type){
 
-    //create source, destination and auxiliary vertex
-    struct node* source;
-    struct node* desti;
-    struct node* temp;
-    struct node* temp2;
+  //create source, destination and auxiliary vertex
+  struct node* source;
+  struct node* desti;
+  struct node* temp;
+  struct node* temp2;
 
-    //provider-customer relationship (src - type 1, dest - type 3)
+  //provider-customer relationship (src - type 1, dest - type 3)
+  if(type == 1){
+    source = createNode(src, 1);
+    desti = createNode(dest, 3);
+    temp = graph->a_list_c[src];
+    temp2 = graph->a_list_p[dest];
+    if(graph->a_list[src] == 0){
+      (graph->num_V)++;
+      graph->a_list[src] = 1;
+    }
+    if(graph->a_list[dest] == 0){
+      (graph->num_V)++;
+      graph->a_list[dest] = 1;
+    }
+  }
+  //peer-to-peer relationship (src - type 2, dest - type 2)
+  else if (type == 2){
+    source = createNode(src, 2);
+    desti = createNode(dest, 2);
+    temp = graph->a_list_r[src];
+    temp2 = graph->a_list_r[dest];
+    if(graph->a_list[src] == 0){
+      (graph->num_V)++;
+      graph->a_list[src] = 1;
+    }
+  }
+
+  //first node on the source list
+  if(temp == NULL){
+    //put dest node on the 1st position of src adjacencies
+    if(type == 1)
+      graph->a_list_c[src] = desti;
+    else if(type == 2)
+      graph->a_list_r[src] = desti;
+    //checks if the destination list has nodes already
+    if(temp2 == NULL && type != 2){
+      graph->a_list_p[dest] = source;
+    }
+    else if(type != 2){
+      source->next = graph->a_list_p[dest]->next;
+      graph->a_list_p[dest]->next = source;
+    }
+  }
+  //if it is not the first node in the source list
+  else{
+
     if(type == 1){
-      source = createNode(src, 1);
-      desti = createNode(dest, 3);
-      temp = graph->a_list_c[src];
-      temp2 = graph->a_list_c[dest];
-      graph->a_list[src] = 1;
+      desti->next = graph->a_list_c[src]->next;
+      graph->a_list_c[src]->next = desti;
     }
-    //customer-provider relationship (src - type 3, dest - type 1)
-    else if (type == 3){
-      source = createNode(src, 3);
-      desti = createNode(dest, 1);
-      temp = graph->a_list_p[src];
-      temp2 = graph->a_list_p[dest];
+    else if(type == 2){
+      desti->next = graph->a_list_r[src]->next;
+      graph->a_list_r[src]->next = desti;
     }
-    //peer-to-peer relationship (src - type 2, dest - type 2)
-    else if (type == 2){
-      source = createNode(src, 2);
-      desti = createNode(dest, 2);
-      temp = graph->a_list_r[src];
-      temp2 = graph->a_list_r[dest];
-      graph->a_list[src] = 1;
+    //checks if the destination list has nodes already
+    if(temp2 == NULL && type != 2){
+      graph->a_list_p[dest] = source;
     }
-
-    //first node on the source list
-    if(temp == NULL){
-      //put dest node on the 1st position of src adjacencies
-      if(type == 1)
-        graph->a_list_c[src] = desti;
-      else if(type == 2)
-        graph->a_list_r[src] = desti;
-      else
-        graph->a_list_p[src] = desti;
-
-      (graph->num_V)++; //increments number of nodes
-      //checks if the destination list has nodes already
-      if(temp2 == NULL && type != 2){
-        (graph->num_V)++;
-        if(type == 1)
-          graph->a_list_p[dest] = source;
-        else if (type == 3)
-          graph->a_list_c[dest] = source;
-      }
-      else if(type != 2){
-
-        if(type == 1){
-          source->next = graph->a_list_p[dest]->next;
-          graph->a_list_p[dest]->next = source;
-        }
-        else if (type == 3){
-          source->next = graph->a_list_c[dest]->next;
-          graph->a_list_c[dest]->next = source;
-        }
-      }
+    else if(type != 2){
+      source->next = graph->a_list_p[dest]->next;
+      graph->a_list_p[dest]->next = source;
     }
-    //if it is not the first node in the source list
-    else{
-
-      if(type == 1){
-        desti->next = graph->a_list_c[src]->next;
-        graph->a_list_c[src]->next = desti;
-      }
-      else if(type == 2){
-        desti->next = graph->a_list_r[src]->next;
-        graph->a_list_r[src]->next = desti;
-      }
-      else{
-        desti->next = graph->a_list_p[src]->next;
-        graph->a_list_p[src]->next = desti;
-      }
-      //checks if the destination list has nodes already
-      if(temp2 == NULL && type != 2){
-        if(type == 1)
-          graph->a_list_p[dest] = source;
-        else
-          graph->a_list_c[dest] = source;
-
-        (graph->num_V)++;
-      }
-      else if(type != 2){
-        if(type == 1){
-          source->next = graph->a_list_p[dest]->next;
-          graph->a_list_p[dest]->next = source;
-        }
-        else if (type == 3){
-          source->next = graph->a_list_c[dest]->next;
-          graph->a_list_c[dest]->next = source;
-        }
-      }
-    }
+  }
 }
 
 /***************************************************************************
@@ -473,13 +446,16 @@ void check_length(struct Graph * graph, struct Queue * queue){
 
   for(int i = 0; i < 12; i++){
     for(int j = 0; j < 12; j++){
-      length[i][j] = 0;
+      /*if(i == j || i == 0 || j == 0)
+        length[i][j] = 0;
+      else*/
+        length[i][j] = 1000;
     }
   }
 
   //gets all nodes that are tier1
-   if(graph->tier1[0] != -2)
-      findTier1(graph);
+  // if(graph->tier1[0] != -2)
+    //  findTier1(graph);
 
   // //for each tier1 node, count the number of peer tier1 nodes
   // for(int i = 1; i < MAX_NODES; i++){
@@ -527,38 +503,74 @@ void Dijkstra(struct Graph * graph, struct Queue * queue, int src, int** length,
   int visited[MAX_NODES], count, mindistance, nextnode, i, j;
   int flag = 0;
   int id_visited = 0;
+  int num_visited = 0;
   struct node* temp;
 
   for(int i = 0; i < MAX_NODES ; i++ ){
     graph->visited[i] = 0;
     graph->l[i] = 0;
     curr_type[i] = 0;
+    //if(graph->a_list[i] != 0)
+     // printf("a_list: %d     ", i);
   }
+ // printf("\n");
 
-  push_queue(queue, src);
+  //push_queue(queue, src);
   curr_type[src] = -1;
+  int flag1 = 0;
 
-  while (queue->count != 0){
-    //pops first item in queue, marks as visiteda and see it's adjacent nodes
-    int id_pop = pop_queue(queue);
-    graph->visited[id_pop] = 1;
+  while (num_visited != graph->num_V){
+    //pops first item in queue, marks as visited and see its adjacent nodes
+    //int id_pop = pop_queue(queue);
+    int id_pop = 0;
+    int n = 0;
 
-    temp = graph->a_list_c[id_pop];
+
+    length[src][src] = 0;
+
+    for(int i = 1; i < MAX_NODES; i++){
+      if(n == graph->num_V)
+        break;
+      if(graph->a_list[i] != 0){
+        n++;
+        // printf("lengths %d: %d  %d\n", i, length[src][i], length[src][id_pop]);
+        if(length[src][i] <= length[src][id_pop]
+            && graph->visited[i] == 0)
+          id_pop = i;
+      }
+    }
+
+    if(graph->visited[id_pop] == 0){
+      graph->visited[id_pop] = 1;
+      num_visited++;
+    }
+
+   // printf("num_visited: %d\n", num_visited);
+
+    temp = graph->a_list_p[id_pop];
 
     //put popped items adjacent nodes in queue
-    printf("No src do client: %d\n", id_pop);
+   // printf("No src do provider: %d\n", id_pop);
     while(temp){
-      printf("Vizinho: %d\n",temp->name);
-      //if it's not visited we put the adjacent node in queue
-      if(graph->visited[temp->name] == 0){
-          curr_type[temp->name] = temp->type;
-          if(curr_type[id_pop] == -1 ||  curr_type[temp->name] == 3){
-            printf("length: %d\n", graph->l[id_pop]);
-            graph->visited[temp->name] = 1;
-            length[src][temp->name] = graph->l[id_pop] + 1;
-            graph->l[temp->name] = length[src][temp->name];
-            push_queue(queue, temp->name);
+     /* printf("Vizinho: %d\n",temp->name);
+      printf("curr_type: %d\n", curr_type[temp->name]);
+      printf("visited: %d\n", graph->visited[temp->name]);*/
+      if(temp->name != src /*&& graph->visited[temp->name] == 0*/){
+        //verifies commercial relationships
+        if(curr_type[id_pop] == -1 || curr_type[id_pop] == 1){
+          if(curr_type[temp->name] == 0){
+            curr_type[temp->name] = temp->type;
+          //  printf("curr_type entrou: %d\n", curr_type[temp->name]);
           }
+          //printf("curr_type pai: %d\n", curr_type[id_pop]);
+
+          //printf("length pai: %d\n", graph->l[id_pop]);
+          if(((length[src][id_pop] + 1) < length[src][temp->name]) || curr_type[temp->name] > 1/*) || curr_type[id_pop] < curr_type[temp->name]*/){
+            length[src][temp->name] = length[src][id_pop] + 1;
+            graph->l[temp->name] = length[src][temp->name];
+            //printf("length: %d\n", graph->l[temp->name]);
+          }
+        }
       }
       temp = temp->next;
     }
@@ -566,44 +578,54 @@ void Dijkstra(struct Graph * graph, struct Queue * queue, int src, int** length,
     temp = graph->a_list_r[id_pop];
 
     //put popped items adjacent nodes in queue
-    printf("No src do peer: %d\n", id_pop);
+    //printf("No src do peer: %d\n", id_pop);
     while(temp){
-      printf("Vizinho: %d\n",temp->name);
-      //if it's not visited we put the adjacent node in queue
-      if(graph->visited[temp->name] == 0){
-          curr_type[temp->name] = temp->type;
-          if(curr_type[id_pop] == -1 || curr_type[temp->name] == 3){
-            printf("length: %d\n", graph->l[id_pop]);
-            graph->visited[temp->name] = 1;
-            length[src][temp->name] = graph->l[id_pop] + 1;
-            graph->l[temp->name] = length[src][temp->name];
-            push_queue(queue, temp->name);
+      /*printf("Vizinho: %d\n",temp->name);
+      printf("curr_type: %d\n", curr_type[temp->name]);*/
+      if((curr_type[temp->name] == 3 || curr_type[temp->name] == 0) && temp->name != src /*&& graph->visited[temp->name] == 0*/){
+        if(curr_type[id_pop] == -1 || curr_type[id_pop] == 1){
+          if(curr_type[temp->name] == 0){
+            curr_type[temp->name] = temp->type;
+            //printf("curr_type entrou: %d\n", curr_type[temp->name]);
           }
-      }
-      temp = temp->next;
-    }
+          //printf("curr_type pai: %d\n", curr_type[id_pop]);
 
-    temp = graph->a_list_p[id_pop];
-
-    //put popped items adjacent nodes in queue
-    printf("No src do provider: %d\n", id_pop);
-    while(temp){
-      printf("Vizinho: %d\n",temp->name);
-      //if it's not visited we put the adjacent node in queue
-      if(graph->visited[temp->name] == 0){
-
-        curr_type[temp->name] = temp->type;
-        if(curr_type[id_pop] == -1 || curr_type[id_pop] == 1 ){
-          printf("length: %d\n", graph->l[id_pop]);
-          graph->visited[temp->name] = 1;
-          length[src][temp->name] = graph->l[id_pop] + 1;
-          graph->l[temp->name] = length[src][temp->name];
-          push_queue(queue, temp->name);
+          //printf("length pai: %d\n", graph->l[id_pop]);
+          if((((length[src][id_pop] + 1) < length[src][temp->name]) && curr_type[temp->name] == 2) || (curr_type[temp->name] == 1 /*&& curr_type[id_pop] < curr_type[temp->name]*/)){
+            length[src][temp->name] = length[src][id_pop] + 1;
+            graph->l[temp->name] = length[src][temp->name];
+            //printf("length: %d\n", graph->l[temp->name]);
+          }
         }
       }
       temp = temp->next;
     }
-    
+
+    temp = graph->a_list_c[id_pop];
+
+    //put popped items adjacent nodes in queue
+    //printf("No src do client: %d\n", id_pop);
+    while(temp){
+      /*printf("Vizinho: %d\n",temp->name);
+      printf("curr_type: %d\n", curr_type[temp->name]);*/
+      if((curr_type[temp->name] == 3 || curr_type[temp->name] == 0) && temp->name != src /*&& graph->visited[temp->name] == 0*/){
+        if(curr_type[temp->name] == 0){
+          curr_type[temp->name] = temp->type;
+          //printf("curr_type entrou: %d\n", curr_type[temp->name]);
+        }
+        //if(curr_type[id_pop] == -1){
+          /*printf("length pai: %d\n", graph->l[id_pop]);
+          printf("length filho: %d\n", graph->l[temp->name]);
+          printf("curr_type pai: %d\n", curr_type[id_pop]);*/
+        if((((length[src][id_pop] + 1) < length[src][temp->name]) && curr_type[temp->name] == 3) || (curr_type[temp->name] < 3)){ //&& curr_type[id_pop] > curr_type[temp->name]
+          length[src][temp->name] = length[src][id_pop] + 1;
+          graph->l[temp->name] = length[src][temp->name];
+          //printf("length: %d\n", graph->l[temp->name]);
+        }
+      }
+      temp = temp->next;
+    }
+
   }
 
   for(int x = 0; x < 12; x++){
