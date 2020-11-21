@@ -49,17 +49,23 @@ int main(int argc, char **argv) {
             //retrieves option chose
             scanf("%d", &option);
 
-            if(option == 1){
-                //alg1
+            if(option == 1)
+            {
+                printf("Enter source and destiny node:\n");
+                if(scanf("%d %d", &src, &dest) == 2){
+                    check_length_type(graph, queue, src, dest, option);
+                }
+                else
+                    printf("Invalid input\n");
             }
 
             else if(option == 2){
-                if(graph->tier1[0] != -2)
-                    findTier1(graph);
-                //if(graph->n_tier1 > 0)
-                check_length(graph, queue);
-                // else
-                //     NoTier1_CommerciallyConn(graph);
+                printf("Enter source and destiny node:\n");
+                if(scanf("%d %d", &src, &dest) == 2){
+                    check_length_type(graph, queue, src, dest, option);
+                }
+                else
+                    printf("Invalid input\n");
             }
 
             else if(option == 3){
@@ -73,7 +79,6 @@ int main(int argc, char **argv) {
                 freeAll(graph, queue);
                 exit(0);
             }
-
         }
     }
     else{

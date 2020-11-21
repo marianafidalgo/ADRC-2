@@ -185,51 +185,6 @@ void printGraph(struct Graph* graph)
   printf("Number of nodes: %d\n", (graph->num_V));
 }
 
- /***************************************************************************
- * Function: BFS()
- *    Input: pointer to graph struct, pointer to queue struct
- *     Task: Function that checks if a graph is connected, by implementing
- *           the BFS algorithm. It runs a BFS only starting in one single
- *           node, since if it can't reach all it won't be connected.
- *   Output: none
- **************************************************************************/
-void BFS(struct Graph* graph_, struct Queue * queue){
-
-  int flag = 0;
-  int id_visited = 0;
-  struct Graph* graph = graph_;
-  // struct node* temp = graph->a_list[0];
-
-  // //first node in the adjacency list gets pushed
-  // for(int i = 1; i < MAX_NODES; i++)
-  // {
-  //   if(graph->a_list[i] != NULL){
-  //     push_queue(queue, graph->a_list[i]->name);
-  //     break;
-  //   }
-  // }
-
-  // while (queue->count != 0){
-  //   //pops first item in queue, marks as visiteda and see it's adjacent nodes
-  //   int id_pop = pop_queue(queue);
-  //   graph->visited[id_pop] = 1;
-
-  //   temp = graph->a_list[id_pop];
-
-  //   //put popped items adjacent nodes in queue
-  //   while(temp)
-  //   {
-  //     //if it's not visited we put the adjacent node in queue
-  //     if(graph->visited[temp->name] == 0){
-  //       graph->visited[temp->name] = 1;
-  //       push_queue(queue, temp->name);
-  //     }
-
-  //     temp = temp->next;
-  //   }
-  // }
-}
-
 /***************************************************************************
  * Function: findTier1()
  *    Input: pointer to graph struct
@@ -322,70 +277,6 @@ int pop_queue( struct Queue* queue )
 }
 
 /***************************************************************************
- * Function: DFS_normal()
- *    Input: pointer to graph struct, node being analysed, incremental int,
- *           vector that stores the current path, vector that stores the
- *           names of the visited nodes in order of visitation, vector
- *           that store the order of termination of the nodes
- *     Task: Recursive function that runs a DFS that checks all the clients
- *           of the node received, marks them as visited and stores their
- *           termination time
- *   Output: returns the index of the last occupied position in vector last
- **************************************************************************/
-int DFS_normal(struct Graph * graph, int v, int curr, int curr_path[], int stack[], int *last){
-  struct node* temp;
-  int i = 0, j = 0, flag = 0;
-
-  // //marks the node as visited
-  // graph->visited[v] = 1;
-  // //puts the node in the current path
-  // curr_path[v] = 1;
-  // //saves the node name in the stack
-  // stack[curr] = v;
-  // curr++;
-
-  //visits all the node's adjacencies
-  // temp = graph->a_list[v];
-  // while(temp){
-  //   //if the node is a client and is in the current path then there is a cycle
-  //   if(temp->type == 3 && curr_path[temp->name] == 1){
-  //     //save last node before cycle
-  //     last[curr_last] = v;
-  //     curr_last++;
-  //     for(i = 0; i < MAX_NODES; i++){
-  //       if(stack[i] == temp->name)
-  //         break;
-  //     }
-  //   }
-  //   //if the node is a client and was not visited, run a DFS on it
-  //   if(graph->visited[temp->name] == 0 && temp->type == 3){
-  //     DFS_normal(graph, temp->name, curr, curr_path, stack, last);
-  //   }
-  //   temp = temp->next;
-  // }
-  //when the node does not have more clients takes it from the path
-  // curr_path[v] = 0;
-  // for(int i = 0; i < MAX_NODES; i++)
-  // {
-  //   //check if item is already in the last array
-  //   if(v == last[i]){
-  //     flag = -1;
-  //     break;
-  //   }
-  //   //checks if there are more elements in last array
-  //   if(last[i] == 0)
-  //     break;
-  // }
-  // if(flag == 0){
-  //   last[curr_last] = v;
-  //   curr_last++;
-  // }
-  // flag = 0;
-
-  // return curr_last;
-}
-
-/***************************************************************************
  * Function: CommerciallyConn()
  *    Input: pointer to graph struct
  *     Task: Function that checks if every tier 1 node is peer of every other
@@ -431,120 +322,90 @@ int CommerciallyConn(struct Graph * graph)
   return flag;
 }
 
-void check_length(struct Graph * graph, struct Queue * queue){
+void check_length_type(struct Graph * graph, struct Queue * queue, int src, int dest, int question){
   struct node* temp;
-  int flag = 0;
-  int peert1 = 0;
-  int tier1 = 0;
+  int *length = (int*)malloc(MAX_NODES*sizeof(int));
+  int *curr_type = (int*)malloc(MAX_NODES*sizeof(int));
+  int *in_queue = (int*)malloc(MAX_NODES*sizeof(int));
+  int final_length[11];
+  int final_type[4];
+  int ans = 0, ans_ = 0;
+  int asked_len = 0;
+  int asked_type = 0;
 
-  FILE *f1 = fopen("length_stats.txt", "w");
-  FILE *f2 = fopen("type_stats.txt", "w");
-
-  if (f1 == NULL || f2 == NULL ){
-    printf("Cannot open file \n");
-    exit(0);
+  for(int i = 1; i < MAX_NODES; i++){
+    if(graph->a_list[i] != 0){
+      length[i] = 1000;
+      curr_type[i] = 0;
+    }
+    else{
+      length[i] = -2;
+      curr_type[i] = -2;
+    }
+    in_queue[i] = 0;
+    if(i < 11){
+      final_length[i] = 0;
+      if(i < 4)
+        final_type[i] = 0;
+    }
   }
 
   if(CommerciallyConn(graph) != -1){
     int n = 0;
-    int i = 0;
-    for(int i = 0; i < MAX_NODES; i++){
-      if(n == graph->num_V)
-        break;
-      if(graph->a_list[i] != 0){
-        printf("no src %d\n",i);
-        Dijkstra(graph, queue, i, f1, f2);
-        printf("\n\n");
-        n++;
-      }
-    }
-  }
-  fclose(f1);
-  fclose(f2);
-}
-
-void Dijkstra(struct Graph * graph, struct Queue * queue, int src, FILE *f1,  FILE *f2){
-
-  int distance[MAX_NODES];
-  int visited[MAX_NODES], count, mindistance, nextnode, i, j;
-  int flag = 0;
-  int id_visited = 0;
-  int num_visited = 0;
-  struct node* temp;
-
-  int *length = (int*)malloc(MAX_NODES*sizeof(int));
-  int *curr_type = (int*)malloc(MAX_NODES*sizeof(int));
-
-  for(int i = 0; i < MAX_NODES ; i++ ){
-    if(graph->a_list[i] != 0){
-      graph->visited[i] = 0;
-      curr_type[i] = 0;
-      length[i] = 1000;
-    }
-    else{
-      length[i] = -2;
-    }
-    //if(graph->a_list[i] != 0)
-     // printf("a_list: %d     ", i);
-  }
- // printf("\n");
-
-  //push_queue(queue, src);
-  curr_type[src] = -1;
-  int flag1 = 0;
-
-  while (num_visited != graph->num_V){
-    //pops first item in queue, marks as visited and see its adjacent nodes
-    //int id_pop = pop_queue(queue);
-    int id_pop = 0;
-    int n = 0;
-
-    length[src] = 0;
-
     for(int i = 1; i < MAX_NODES; i++){
       if(n == graph->num_V)
         break;
-      if(graph->a_list[i] != 0 && length[i] != 1000 && graph->visited[i] == 0){
+      if(graph->a_list[i] != 0){
+        ans_ = BGP(graph, queue, i, length, curr_type, in_queue, final_type, final_length, src, dest, question, asked_len, asked_type);
+        if(ans_ != 0)
+          ans = ans_;
         n++;
-        id_pop = i;
-        break;
-        // printf("lengths %d: %d  %d\n", i, length[src][i], length[src][id_pop]);
-
-        // if(length[i] <= length[id_pop]
-        //     && graph->visited[i] == 0)
-        //   id_pop = i;
       }
     }
+  }
+
+  if(question == 1){
+    if(ans == 0)
+      printf("There is no path from %d to %d\n",src, dest);
+    else if(ans == 1)
+      printf("The path from %d to %d is a provider path\n",src, dest);
+    else if(ans == 2)
+      printf("The path from %d to %d is a peer path\n",src, dest);
+    else if(ans == 3)
+      printf("The path from %d to %d is a customer path\n",src, dest);
+  }
+  else if(question == 2)
+    printf("The length of the path from %d to %d is %d\n", src, dest, ans);
+
+  free(length);
+  free(curr_type);
+  free(in_queue);
+}
+
+int BGP(struct Graph * graph, struct Queue * queue, int src, int *length, int* curr_type, int * in_queue, int final_type[], int final_length[], int source, int dest, int question, int asked_len, int asked_type){
+
+  struct node* temp;
+
+  push_queue(queue, src);
+  curr_type[src] = -1;
+
+  while (queue->count != 0){
+    int id_pop = pop_queue(queue);
+    length[src] = 0;
 
     if(graph->visited[id_pop] == 0){
       graph->visited[id_pop] = 1;
-      num_visited++;
     }
-
-   // printf("num_visited: %d\n", num_visited);
 
     temp = graph->a_list_p[id_pop];
 
-    //put popped items adjacent nodes in queue
-   // printf("No src do provider: %d\n", id_pop);
     while(temp){
-     /* printf("Vizinho: %d\n",temp->name);
-      printf("curr_type: %d\n", curr_type[temp->name]);
-      printf("visited: %d\n", graph->visited[temp->name]);*/
-      if(temp->name != src /*&& graph->visited[temp->name] == 0*/){
-        //verifies commercial relationships
-        if(curr_type[id_pop] == -1 || curr_type[id_pop] == 1){
-          if(curr_type[temp->name] == 0){
-            curr_type[temp->name] = temp->type;
-          //  printf("curr_type entrou: %d\n", curr_type[temp->name]);
-          }
-          //printf("curr_type pai: %d\n", curr_type[id_pop]);
-
-          //printf("length pai: %d\n", graph->l[id_pop]);
-          if(((length[id_pop] + 1) < length[temp->name]) || curr_type[temp->name] > 1/*) || curr_type[id_pop] < curr_type[temp->name]*/){
-            length[temp->name] = length[id_pop] + 1;
-            //printf("length: %d\n", graph->l[temp->name]);
-          }
+      if(temp->name != src && (curr_type[id_pop] == -1 || curr_type[id_pop] == 1) && (curr_type[temp->name] == 0 || curr_type[temp->name] > 1)){
+        length[temp->name] = length[id_pop] + 1;
+        curr_type[temp->name] = temp->type;
+        if(in_queue[temp->name] == 0 && graph->visited[temp->name] == 0){
+          push_queue(queue, temp->name);
+          in_queue[temp->name] = 1;
         }
       }
       temp = temp->next;
@@ -552,24 +413,13 @@ void Dijkstra(struct Graph * graph, struct Queue * queue, int src, FILE *f1,  FI
 
     temp = graph->a_list_r[id_pop];
 
-    //put popped items adjacent nodes in queue
-    //printf("No src do peer: %d\n", id_pop);
     while(temp){
-      /*printf("Vizinho: %d\n",temp->name);
-      printf("curr_type: %d\n", curr_type[temp->name]);*/
-      if((curr_type[temp->name] == 3 || curr_type[temp->name] == 0) && temp->name != src /*&& graph->visited[temp->name] == 0*/){
-        if(curr_type[id_pop] == -1 || curr_type[id_pop] == 1){
-          if(curr_type[temp->name] == 0){
-            curr_type[temp->name] = temp->type;
-            //printf("curr_type entrou: %d\n", curr_type[temp->name]);
-          }
-          //printf("curr_type pai: %d\n", curr_type[id_pop]);
-
-          //printf("length pai: %d\n", graph->l[id_pop]);
-          if((((length[id_pop] + 1) < length[temp->name]) && curr_type[temp->name] == 2) || (curr_type[temp->name] == 1 /*&& curr_type[id_pop] < curr_type[temp->name]*/)){
-            length[temp->name] = length[id_pop] + 1;
-            //printf("length: %d\n", graph->l[temp->name]);
-          }
+      if((curr_type[temp->name] == 3 || curr_type[temp->name] == 0) && temp->name != src && (curr_type[id_pop] == -1 || curr_type[id_pop] == 1)){
+        length[temp->name] = length[id_pop] + 1;
+        curr_type[temp->name] = temp->type;
+        if(in_queue[temp->name] == 0 && graph->visited[temp->name] == 0){
+          push_queue(queue, temp->name);
+          in_queue[temp->name] = 1;
         }
       }
       temp = temp->next;
@@ -577,41 +427,52 @@ void Dijkstra(struct Graph * graph, struct Queue * queue, int src, FILE *f1,  FI
 
     temp = graph->a_list_c[id_pop];
 
-    //put popped items adjacent nodes in queue
-    //printf("No src do client: %d\n", id_pop);
     while(temp){
-      /*printf("Vizinho: %d\n",temp->name);
-      printf("curr_type: %d\n", curr_type[temp->name]);*/
-      if((curr_type[temp->name] == 3 || curr_type[temp->name] == 0) && temp->name != src /*&& graph->visited[temp->name] == 0*/){
-        if(curr_type[temp->name] == 0){
-          curr_type[temp->name] = temp->type;
-          //printf("curr_type entrou: %d\n", curr_type[temp->name]);
-        }
-        //if(curr_type[id_pop] == -1){
-          /*printf("length pai: %d\n", graph->l[id_pop]);
-          printf("length filho: %d\n", graph->l[temp->name]);
-          printf("curr_type pai: %d\n", curr_type[id_pop]);*/
-        if((((length[id_pop] + 1) < length[temp->name]) && curr_type[temp->name] == 3) || (curr_type[temp->name] < 3)){ //&& curr_type[id_pop] > curr_type[temp->name]
-          length[temp->name] = length[id_pop] + 1;
-          //printf("length: %d\n", graph->l[temp->name]);
+      if(curr_type[temp->name] == 0 && temp->name != src){
+        //if(/*(((length[id_pop] + 1) < length[temp->name])
+        length[temp->name] = length[id_pop] + 1;
+        curr_type[temp->name] = temp->type;
+        if(in_queue[temp->name] == 0 && graph->visited[temp->name] == 0){
+          push_queue(queue, temp->name);
+          in_queue[temp->name] = 1;
         }
       }
       temp = temp->next;
     }
-
   }
-    //printf(" [");
-    for(int y = 1; y < MAX_NODES; y++){
-        //printf("%d     ", length[y]);
-        fprintf(f1, "%d ", length[y]);
-        fprintf(f2, "%d ", curr_type[y]);
-    }
-    fprintf(f1, "\n");
-    fprintf(f2, "\n");
 
-    free(curr_type);
-    free(length);
-    //printf("]\n");
+  for(int i = 1; i < MAX_NODES ; i++ ){
+    if(curr_type[i] >= 0)
+      final_type[curr_type[i]]++;
+    if(length[i] > 9)
+      final_length[10]++;
+    else
+      final_length[length[i]]++;
+    if(src == dest && i == source){
+      asked_len = length[i];
+      asked_type = curr_type[i];
+    }
+    if(graph->a_list[i] != 0){
+      length[i] = 1000;
+      graph->visited[i] = 0;
+      curr_type[i] = 0;
+    }
+    else{
+      length[i] = -2;
+      curr_type[i] = -2;
+    }
+    queue->array[i] = 0;
+    in_queue[i] = 0;
+  }
+
+  queue->count = 0;
+  queue->head = 0;
+  queue->tail = 0;
+
+  if(question == 1)
+    return asked_type;
+  else if(question == 2)
+    return asked_len;
 }
 
 /***************************************************************************
