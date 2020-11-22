@@ -21,7 +21,6 @@ struct Graph {
     int * visited; //stores visited nodes
     int * tier1; //stores tier 1 nodes
     int n_tier1; //number of tier 1 nodes
-    int * l;
 };
 
 struct Queue {
@@ -39,14 +38,13 @@ struct Graph* createGraph();
 struct Queue* createQueue();
 void addEdge(struct Graph* graph, int src, int dest, int type);
 void printGraph(struct Graph* graph);
-void BFS(struct Graph* graph, struct Queue * queue);
 int findTier1(struct Graph* graph);
 int pop_queue(struct Queue* queue);
 int push_queue(struct Queue* queue, int a);
-int DFS_normal(struct Graph * graph, int v, int curr, int curr_path[], int stack[], int * last);
-void CommerciallyConn(struct Graph* graph);
-void check_length(struct Graph * graph, struct Queue * queue);
-void Dijkstra(struct Graph * graph, struct Queue * queue, int src, int** length, int *curr_type);
+int CommerciallyConn(struct Graph* graph);
+void check_length_type(struct Graph * graph, struct Queue * queue, int src, int dest, int question);
+int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int * curr_type, int * in_queue, 
+      int * final, int source, int dest, int question);
 void freeAll(struct Graph* graph, struct Queue * queue);
 
 #endif
