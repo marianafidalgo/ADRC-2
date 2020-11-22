@@ -327,9 +327,8 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
   int *length = (int*)malloc(MAX_NODES*sizeof(int));
   int *curr_type = (int*)malloc(MAX_NODES*sizeof(int));
   int *in_queue = (int*)malloc(MAX_NODES*sizeof(int));
-  int *final = (int*)malloc(MAX_NODES*sizeof(int)); 
-  if(final != NULL)
-    printf("ola\n");
+  int *final = (int*)malloc(11*sizeof(int));
+
   int ans = 0, ans_ = 0;
 
   for(int i = 0; i < MAX_NODES; i++){
@@ -376,7 +375,7 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
             "The number of invalid paths is %d\n"
             "The number of customer paths is %d\n"
             "The number of peer paths is %d\n"
-            "The number of provider paths is %d\n", /*final_type[0], final_type[1], final_type[2], final_type[3]);*/
+            "The number of provider paths is %d\n",
             final[0], final[1], final[2], final[3]);
   }
   else if(question == 2){
@@ -392,19 +391,17 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
             "The number of paths with length 7 is %d\n"
             "The number of paths with length 8 is %d\n"
             "The number of paths with length 9 is %d\n"
-            "The number of paths with length 10+ is %d\n", 
-            /*final_length[0], final_length[1], final_length[2], final_length[3], final_length[4], final_length[5],
-            final_length[6], final_length[7], final_length[8], final_length[9], final_length[10]);*/
+            "The number of paths with length 10+ is %d\n",
             final[0], final[1], final[2], final[3], final[4], final[5],
             final[6], final[7], final[8], final[9], final[10]);
   }
 
-  //free(final_length);
   free(length);
   free(curr_type);
   free(in_queue);
   free(final);
-  
+  exit(0);
+
 }
 
 int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int * curr_type, int * in_queue, int * final, int source, int dest, int question){
@@ -471,15 +468,15 @@ int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int *
 
   for(int i = 1; i < MAX_NODES ; i++ ){
     if(question == 1){
-      if(curr_type[i] >= 0){
+      if(curr_type[i] >= 0 && i != src){
         a = curr_type[i];
         final[a] = final[a] + 1;
       }
     }
-    if(question == 2){
+    else if(question == 2){
       if(length[i] > 9 && length[i] != 1000)
         final[10] = final[10] + 1;
-      else if(length[i] < 10 && length[i] != 1000){
+      else if(length[i] < 10 && length[i] != 1000 && length[i] != -2 /*&& i != src*/){
         a = length[i];
         final[a] = final[a] + 1;
       }
