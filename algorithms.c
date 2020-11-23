@@ -428,10 +428,10 @@ int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int *
       if(temp->name != src && (curr_type[id_pop] == -1 || curr_type[id_pop] == 1) && (curr_type[temp->name] == 0 || curr_type[temp->name] > 1)){
         length[temp->name] = length[id_pop] + 1;
         curr_type[temp->name] = temp->type;
-        if(in_queue[temp->name] == 0 && graph->visited[temp->name] == 0){
+        //if(in_queue[temp->name] == 0 && graph->visited[temp->name] == 0){
           push_queue(queue, temp->name);
           in_queue[temp->name] = 1;
-        }
+        //}
       }
       temp = temp->next;
     }
@@ -442,10 +442,10 @@ int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int *
       if((curr_type[temp->name] == 3 || curr_type[temp->name] == 0) && temp->name != src && (curr_type[id_pop] == -1 || curr_type[id_pop] == 1)){
         length[temp->name] = length[id_pop] + 1;
         curr_type[temp->name] = temp->type;
-        if(in_queue[temp->name] == 0 && graph->visited[temp->name] == 0){
+        //if(in_queue[temp->name] == 0 && graph->visited[temp->name] == 0){
           push_queue(queue, temp->name);
           in_queue[temp->name] = 1;
-        }
+        //}
       }
       temp = temp->next;
     }
@@ -457,10 +457,10 @@ int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int *
         //if(/*(((length[id_pop] + 1) < length[temp->name])
         length[temp->name] = length[id_pop] + 1;
         curr_type[temp->name] = temp->type;
-        if(in_queue[temp->name] == 0 && graph->visited[temp->name] == 0){
+        //if(in_queue[temp->name] == 0 && graph->visited[temp->name] == 0){
           push_queue(queue, temp->name);
           in_queue[temp->name] = 1;
-        }
+        //}
       }
       temp = temp->next;
     }

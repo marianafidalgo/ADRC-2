@@ -43,7 +43,7 @@ int pop_queue(struct Queue* queue);
 int push_queue(struct Queue* queue, int a);
 int CommerciallyConn(struct Graph* graph);
 void check_length_type(struct Graph * graph, struct Queue * queue, int src, int dest, int question);
-int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int * curr_type, int * in_queue, 
+int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int * curr_type, int * in_queue,
       int * final, int source, int dest, int question);
 void freeAll(struct Graph* graph, struct Queue * queue);
 
