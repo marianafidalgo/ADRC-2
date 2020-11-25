@@ -353,24 +353,21 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
         final_type[i] = 0;
     }
   }
-
- // if(CommerciallyConn(graph) != -1){
-   if(question == 5){
+  
+  if(question == 5){
     int n = 0;
     for(int i = 1; i < MAX_NODES; i++){
       if(n == graph->num_V)
         break;
       if(graph->a_list[i] != 0){
-        ans_ = BGP(graph, queue, i, length, curr_type, in_queue, final_length, final_type, src, dest, question);
-        if(ans_ != 0)
-          ans = ans_;
+        BGP(graph, queue, i, length, curr_type, in_queue, final_length, final_type, src, dest, question);
         n++;
       }
     }
-   }
-   else{
-      ans = BGP(graph, queue, dest, length, curr_type, in_queue, final_length, final_type, src, dest, question);
-   }
+  }
+  else{
+    ans = BGP(graph, queue, dest, length, curr_type, in_queue, final_length, final_type, src, dest, question);
+  }
 
   if(question == 1){
     if(ans == 0)
@@ -387,7 +384,7 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
 
   }
   else if(question == 5){
-     printf("Types statistics:\n "
+     printf("Types statistics:\n"
             "The number of invalid paths is %d\n"
             "The number of customer paths is %d\n"
             "The number of peer paths is %d\n"
@@ -562,13 +559,11 @@ int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int *
     // printf("]\n");
 
   for(int i = 1; i < MAX_NODES ; i++ ){
-    if(question == 1){
+    if(question == 5){
       if(curr_type[i] >= 0){
         a = curr_type[i];
         final_type[a] = final_type[a] + 1;
       }
-    }
-    else if(question == 2){
       if(length[i] > 9 && length[i] != 100000)
         final_length[10] = final_length[10] + 1;
       else if(length[i] < 10 && length[i] != 100000 && length[i] != -2){
