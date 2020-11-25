@@ -55,7 +55,10 @@ int main(int argc, char **argv) {
             {
                 printf("Enter source and destiny node:\n");
                 if(scanf("%d %d", &src, &dest) == 2){
-                    check_length_type(graph, queue, src, dest, option);
+                    if(graph->a_list[src] == 0 || graph->a_list[dest] == 0)
+                        printf("One of the nodes does not exist in this graph\n");
+                    else
+                        check_length_type(graph, queue, src, dest, option);
                 }
                 else
                     printf("Invalid input\n");
@@ -64,7 +67,10 @@ int main(int argc, char **argv) {
             else if(option == 2){
                 printf("Enter source and destiny node:\n");
                 if(scanf("%d %d", &src, &dest) == 2){
-                    check_length_type(graph, queue, src, dest, option);
+                    if(graph->a_list[src] == 0 || graph->a_list[dest] == 0)
+                        printf("One of the nodes does not exist in this graph\n");
+                    else
+                        check_length_type(graph, queue, src, dest, option);
                 }
                 else
                     printf("Invalid input\n");
@@ -81,7 +87,7 @@ int main(int argc, char **argv) {
             }
 
             else if(option == 6){
-               
+
             }
             else if(option == 7){
                 fclose(internet);

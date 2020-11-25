@@ -337,6 +337,7 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
 
   int ans = 0, ans_ = 0;
 
+
   for(int i = 0; i < MAX_NODES; i++){
     if(graph->a_list[i] != 0){
       length[i] = 100000;
@@ -353,7 +354,7 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
         final_type[i] = 0;
     }
   }
-  
+
   if(question == 5){
     int n = 0;
     for(int i = 1; i < MAX_NODES; i++){
@@ -380,18 +381,22 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
       printf("The path from %d to %d is a provider path\n",src, dest);
   }
   else if(question == 2){
-    printf("The length of the path from %d to %d is %d\n", src, dest, ans);
+    if (ans == 100000)
+      printf("There is no commercial path from %d to %d\n", src, dest);
+    else
+      printf("The length of the path from %d to %d is %d\n", src, dest, ans);
+
 
   }
   else if(question == 5){
-     printf("Types statistics:\n"
+    printf("Types statistics:\n"
             "The number of invalid paths is %d\n"
             "The number of customer paths is %d\n"
             "The number of peer paths is %d\n"
             "The number of provider paths is %d\n\n\n",
             final_type[0], final_type[1], final_type[2], final_type[3]);
 
-     printf("Lengths statistics :\n"
+    printf("Lengths statistics :\n"
             "The number of paths with length 0 is %d\n"
             "The number of paths with length 1 is %d\n"
             "The number of paths with length 2 is %d\n"
