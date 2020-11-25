@@ -7,6 +7,7 @@
 struct node {
   int name;
   int type;
+  //int prev;
   struct node *next;
 };
 
@@ -17,6 +18,8 @@ struct Graph {
     struct node ** a_list_c; //adjacency list
     struct node ** a_list_r; //adjacency list
     struct node ** a_list_p; //adjacency list
+
+    struct node ** bgp_clients; //adjacency list
     int * a_list; //adjacency list
     int * visited; //stores visited nodes
     int * tier1; //stores tier 1 nodes
@@ -44,7 +47,7 @@ int push_queue(struct Queue* queue, int a);
 int CommerciallyConn(struct Graph* graph);
 void check_length_type(struct Graph * graph, struct Queue * queue, int src, int dest, int question);
 int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int * curr_type, int * in_queue,
-      int * final, int source, int dest, int question);
+      int * final, int * prev, int source, int dest, int question);
 void freeAll(struct Graph* graph, struct Queue * queue);
 
 #endif

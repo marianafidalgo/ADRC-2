@@ -41,10 +41,12 @@ int main(int argc, char **argv) {
         while(1){
 
             printf("\nChoose the algorithm you want to run:\n"
-                "1. Check types\n"
-                "2. Check length\n"
-                "3. 3\n"
+                "1. Check type of path elected by BGP from a source to a destination\n"
+                "2. Check length of path elected by BGP from a source to a destination\n"
+                "3. Check length of the shortest path, of the same type as the one computed by BGP, from a source to a destination\n"
                 "4. Print adjacency list\n"
+                "5. Show statistics of 1st, 2nd options for all source-destination paths\n"
+                "6. Show statistics of 3rd option for all source-destination paths\n"
                 "5. Exit\n\n");
             //retrieves option chose
             scanf("%d", &option);
@@ -74,6 +76,12 @@ int main(int argc, char **argv) {
             }
             else if(option == 4)
                 printGraph(graph);
+
+            else if(option == 5){
+                fclose(internet);
+                freeAll(graph, queue);
+                exit(0);
+            }
 
             else if(option == 5){
                 fclose(internet);
