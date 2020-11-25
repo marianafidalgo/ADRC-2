@@ -12,7 +12,6 @@ struct node* createNode(int id_node, int type) {
 
   newNode->name = id_node;
   newNode->type = type;
-  //newNode->prev = 0;
   newNode->next = NULL;
 
   return newNode;
@@ -333,8 +332,8 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
   int *length = (int*)malloc(MAX_NODES*sizeof(int));
   int *curr_type = (int*)malloc(MAX_NODES*sizeof(int));
   int *in_queue = (int*)malloc(MAX_NODES*sizeof(int));
-  int *final = (int*)malloc(11*sizeof(int));
-  int *prev = (int*)malloc(MAX_NODES*sizeof(int));
+  int *final_length = (int*)malloc(11*sizeof(int));
+  int *final_type = (int*)malloc(4*sizeof(int));
 
   int ans = 0, ans_ = 0;
 
@@ -348,27 +347,30 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
       curr_type[i] = -2;
     }
     in_queue[i] = 0;
-    prev[i] = 0;
     if(i < 11){
-      final[i] = 0;
-      /*if(i < 4)
-        final_type[i] = 0;*/
+      final_length[i] = 0;
+      if(i < 4)
+        final_type[i] = 0;
     }
   }
 
  // if(CommerciallyConn(graph) != -1){
+   if(question == 5){
     int n = 0;
     for(int i = 1; i < MAX_NODES; i++){
       if(n == graph->num_V)
         break;
       if(graph->a_list[i] != 0){
-        ans_ = BGP(graph, queue, i, length, curr_type, in_queue, final,prev, src, dest, question);
+        ans_ = BGP(graph, queue, i, length, curr_type, in_queue, final_length, final_type, src, dest, question);
         if(ans_ != 0)
           ans = ans_;
         n++;
       }
     }
- // }
+   }
+   else{
+      ans = BGP(graph, queue, dest, length, curr_type, in_queue, final_length, final_type, src, dest, question);
+   }
 
   if(question == 1){
     if(ans == 0)
@@ -379,16 +381,20 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
       printf("The path from %d to %d is a peer path\n",src, dest);
     else if(ans == 3)
       printf("The path from %d to %d is a provider path\n",src, dest);
-    printf("Statistics:\n "
-            "The number of invalid paths is %d\n"
-            "The number of customer paths is %d\n"
-            "The number of peer paths is %d\n"
-            "The number of provider paths is %d\n",
-            final[0], final[1], final[2], final[3]);
   }
   else if(question == 2){
     printf("The length of the path from %d to %d is %d\n", src, dest, ans);
-    printf("Statistics:\n"
+
+  }
+  else if(question == 5){
+     printf("Types statistics:\n "
+            "The number of invalid paths is %d\n"
+            "The number of customer paths is %d\n"
+            "The number of peer paths is %d\n"
+            "The number of provider paths is %d\n\n\n",
+            final_type[0], final_type[1], final_type[2], final_type[3]);
+
+     printf("Lengths statistics :\n"
             "The number of paths with length 0 is %d\n"
             "The number of paths with length 1 is %d\n"
             "The number of paths with length 2 is %d\n"
@@ -400,19 +406,20 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
             "The number of paths with length 8 is %d\n"
             "The number of paths with length 9 is %d\n"
             "The number of paths with length 10+ is %d\n",
-            final[0], final[1], final[2], final[3], final[4], final[5],
-            final[6], final[7], final[8], final[9], final[10]);
+            final_length[0], final_length[1], final_length[2], final_length[3], final_length[4], final_length[5],
+            final_length[6], final_length[7], final_length[8], final_length[9], final_length[10]);
   }
 
   free(length);
   free(curr_type);
   free(in_queue);
-  free(final);
-  exit(0);
+  free(final_length);
+  free(final_type);
+  //exit(0);
 
 }
 
-int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int * curr_type, int * in_queue, int * final, int* prev, int source, int dest, int question){
+int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int * curr_type, int * in_queue, int * final_length, int* final_type, int source, int dest, int question){
 
   struct node* temp, *temp1, *temp2, *temp3, *node;
   int asked_len = 0;
@@ -441,7 +448,6 @@ int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int *
       // printf("no provider pop type %d\n", curr_type[id_pop]);
       if(temp->name != src && (curr_type[id_pop] == -1 || curr_type[id_pop] == 1) && (curr_type[temp->name] == 0 || curr_type[temp->name] > 1)){
         length[temp->name] = length[id_pop] + 1;
-        //prev[temp->name] = id_pop;
         //printf("provider new lenght %d\n",  length[temp->name]);
         curr_type[temp->name] = temp->type;
         //printf("provider new type %d\n",  curr_type[temp->name]);
@@ -460,7 +466,6 @@ int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int *
       // printf("no peer type %d\n", curr_type[temp->name]);
       if((curr_type[temp->name] == 3 || curr_type[temp->name] == 0) && temp->name != src && (curr_type[id_pop] == -1 || curr_type[id_pop] == 1)){
         length[temp->name] = length[id_pop] + 1;
-        //prev[temp->name] = id_pop;
         //printf("peer new lenght %d\n",  length[temp->name]);
         curr_type[temp->name] = temp->type;
         //printf("peer new type %d\n",  curr_type[temp->name]);
@@ -558,17 +563,17 @@ int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int *
 
   for(int i = 1; i < MAX_NODES ; i++ ){
     if(question == 1){
-      if(curr_type[i] >= 0 && i != src){
+      if(curr_type[i] >= 0){
         a = curr_type[i];
-        final[a] = final[a] + 1;
+        final_type[a] = final_type[a] + 1;
       }
     }
     else if(question == 2){
       if(length[i] > 9 && length[i] != 100000)
-        final[10] = final[10] + 1;
+        final_length[10] = final_length[10] + 1;
       else if(length[i] < 10 && length[i] != 100000 && length[i] != -2){
         a = length[i];
-        final[a] = final[a] + 1;
+        final_length[a] = final_length[a] + 1;
       }
     }
     if(src == dest && i == source){

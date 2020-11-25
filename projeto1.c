@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
                 "4. Print adjacency list\n"
                 "5. Show statistics of 1st, 2nd options for all source-destination paths\n"
                 "6. Show statistics of 3rd option for all source-destination paths\n"
-                "5. Exit\n\n");
+                "7. Exit\n\n");
             //retrieves option chose
             scanf("%d", &option);
 
@@ -55,7 +55,6 @@ int main(int argc, char **argv) {
             {
                 printf("Enter source and destiny node:\n");
                 if(scanf("%d %d", &src, &dest) == 2){
-                    printf("%d %d\n", src, dest);
                     check_length_type(graph, queue, src, dest, option);
                 }
                 else
@@ -78,12 +77,13 @@ int main(int argc, char **argv) {
                 printGraph(graph);
 
             else if(option == 5){
-                fclose(internet);
-                freeAll(graph, queue);
-                exit(0);
+                check_length_type(graph, queue, 1, 2, option);
             }
 
-            else if(option == 5){
+            else if(option == 6){
+               
+            }
+            else if(option == 7){
                 fclose(internet);
                 freeAll(graph, queue);
                 exit(0);

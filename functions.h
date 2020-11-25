@@ -7,7 +7,6 @@
 struct node {
   int name;
   int type;
-  //int prev;
   struct node *next;
 };
 
@@ -47,7 +46,7 @@ int push_queue(struct Queue* queue, int a);
 int CommerciallyConn(struct Graph* graph);
 void check_length_type(struct Graph * graph, struct Queue * queue, int src, int dest, int question);
 int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int * curr_type, int * in_queue,
-      int * final, int * prev, int source, int dest, int question);
+      int * final_length, int * final_type, int source, int dest, int question);
 void freeAll(struct Graph* graph, struct Queue * queue);
 
 #endif
