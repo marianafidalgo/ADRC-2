@@ -331,7 +331,7 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
   struct node* temp;
   int *length = (int*)malloc(MAX_NODES*sizeof(int));
   int *curr_type = (int*)malloc(MAX_NODES*sizeof(int));
-  int *in_queue = (int*)malloc(MAX_NODES*sizeof(int));
+  //int *in_queue = (int*)malloc(MAX_NODES*sizeof(int));
   int *final_length = (int*)malloc(11*sizeof(int));
   int *final_type = (int*)malloc(4*sizeof(int));
 
@@ -347,7 +347,7 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
       length[i] = -2;
       curr_type[i] = -2;
     }
-    in_queue[i] = 0;
+    //in_queue[i] = 0;
     if(i < 11){
       final_length[i] = 0;
       if(i < 4)
@@ -361,13 +361,13 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
       if(n == graph->num_V)
         break;
       if(graph->a_list[i] != 0){
-        BGP(graph, queue, i, length, curr_type, in_queue, final_length, final_type, src, dest, question);
+        BGP(graph, queue, i, length, curr_type,/* in_queue,*/ final_length, final_type, src, dest, question);
         n++;
       }
     }
   }
   else{
-    ans = BGP(graph, queue, dest, length, curr_type, in_queue, final_length, final_type, src, dest, question);
+    ans = BGP(graph, queue, dest, length, curr_type, /*in_queue,*/ final_length, final_type, src, dest, question);
   }
 
   if(question == 1){
@@ -414,14 +414,14 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
 
   free(length);
   free(curr_type);
-  free(in_queue);
+  //free(in_queue);
   free(final_length);
   free(final_type);
-  //exit(0);
+  exit(0);
 
 }
 
-int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int * curr_type, int * in_queue, int * final_length, int* final_type, int source, int dest, int question){
+int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int * curr_type,/* int * in_queue,*/ int * final_length, int* final_type, int source, int dest, int question){
 
   struct node* temp, *temp1, *temp2, *temp3, *node;
   int asked_len = 0;
@@ -438,9 +438,9 @@ int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int *
     //in_queue[id_pop] = 0;
    // printf("\nno a visitar %d\n", id_pop);
 
-    if(graph->visited[id_pop] == 0){
+    /*if(graph->visited[id_pop] == 0){
       graph->visited[id_pop] = 1;
-    }
+    }*/
 
     temp = graph->a_list_p[id_pop];
 
@@ -453,10 +453,10 @@ int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int *
         //printf("provider new lenght %d\n",  length[temp->name]);
         curr_type[temp->name] = temp->type;
         //printf("provider new type %d\n",  curr_type[temp->name]);
-        if(in_queue[temp->name] == 0 && graph->visited[temp->name] == 0){
+        //if(in_queue[temp->name] == 0 && graph->visited[temp->name] == 0){
           push_queue(queue, temp->name);
-          in_queue[temp->name] = 1;
-        }
+          //in_queue[temp->name] = 1;
+        //}
       }
       temp = temp->next;
     }
@@ -466,15 +466,15 @@ int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int *
     while(temp){
       // printf("no peer %d\n", temp->name);
       // printf("no peer type %d\n", curr_type[temp->name]);
-      if((curr_type[temp->name] == 3 || curr_type[temp->name] == 0) && temp->name != src && (curr_type[id_pop] == -1 || curr_type[id_pop] == 1)){
+      if(/*(curr_type[temp->name] == 3 ||*/ curr_type[temp->name] == 0 && temp->name != src && (curr_type[id_pop] == -1 || curr_type[id_pop] == 1)){
         length[temp->name] = length[id_pop] + 1;
         //printf("peer new lenght %d\n",  length[temp->name]);
         curr_type[temp->name] = temp->type;
         //printf("peer new type %d\n",  curr_type[temp->name]);
-        if(in_queue[temp->name] == 0 && graph->visited[temp->name] == 0){
+        //if(in_queue[temp->name] == 0 && graph->visited[temp->name] == 0){
           push_queue(queue, temp->name);
-          in_queue[temp->name] = 1;
-        }
+          //in_queue[temp->name] = 1;
+        //}
       }
       temp = temp->next;
     }
@@ -582,7 +582,7 @@ int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int *
     }
     if(graph->a_list[i] != 0){
       length[i] = 100000;
-      graph->visited[i] = 0;
+      //graph->visited[i] = 0;
       curr_type[i] = 0;
     }
     else{
@@ -590,7 +590,7 @@ int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int *
       curr_type[i] = -2;
     }
     queue->array[i] = 0;
-    in_queue[i] = 0;
+    //in_queue[i] = 0;
   }
 
   queue->count = 0;
