@@ -20,7 +20,6 @@ struct Graph {
 
     struct node ** bgp_clients; //adjacency list
     int * a_list; //adjacency list
-    int * visited; //stores visited nodes
     int * tier1; //stores tier 1 nodes
     int n_tier1; //number of tier 1 nodes
 };
@@ -48,7 +47,8 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
 int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int * curr_type,
       int * final_length, int * final_type, int source, int dest, int question);
 void check_length_shortest(struct Graph * graph, struct Queue * queue, int src, int dest, int question);
-int BGP_shortest(struct Graph * graph, struct Queue * queue, int src, int * length, int * curr_type, int * final_length, int source, int dest, int question);
+int BGP_shortest(struct Graph * graph, struct Queue * queue, int src, int * length,int * length_p, int * length_r, int * length_c,
+      int * curr_type, int * final_length, int * final_type, int source, int dest, int question);
 
 void freeAll(struct Graph* graph, struct Queue * queue);
 
