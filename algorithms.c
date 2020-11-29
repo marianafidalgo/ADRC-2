@@ -1,11 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+
 #include "functions.h"
 
-int curr_last = 0;
-int scc_i = 0;
 // Create a new node
 struct node* createNode(int id_node, int type) {
 
@@ -30,10 +25,9 @@ struct Graph* createGraph() {
   graph->a_list_r = (struct node **) malloc(MAX_NODES * sizeof(struct node *));
   graph->a_list_p = (struct node **) malloc(MAX_NODES * sizeof(struct node *));
 
-  graph->bgp_clients = (struct node **) malloc(MAX_NODES * sizeof(struct node *));
+  graph->bgp_clients = (struct node **)malloc(MAX_NODES * sizeof(struct node *));
 
-  graph->tier1 = (int*) malloc(MAX_NODES * sizeof(int*));
-  graph->a_list= (int*) malloc(MAX_NODES * sizeof(int*));
+  graph->a_list= (int*)calloc(MAX_NODES, sizeof(int*));
 
   //initializes the vectors
   for(int i = 0; i < MAX_NODES ; i++ ){
@@ -41,8 +35,6 @@ struct Graph* createGraph() {
     graph->a_list_r[i] = NULL;
     graph->a_list_p[i] = NULL;
     graph->bgp_clients[i] = NULL;
-    graph->tier1[i] = 0;
-    graph->a_list[i] = 0;
   }
 
   return graph;
@@ -54,12 +46,7 @@ struct Queue* createQueue() {
   struct Queue* queue = malloc(sizeof(struct Graph));
 
   // Create vertical array of nodes (size MAX_NODES)
-  queue->array = (int*) malloc(MAX_NODES * sizeof(int));
-
-  for(int i = 0; i < MAX_NODES ; ++i )
-  {
-    queue->array[i] = 0;
-  }
+  queue->array = (int*) calloc(MAX_NODES, sizeof(int));
 
   queue->count = 0;
   queue->head = 0;
@@ -158,7 +145,7 @@ void addEdge(struct Graph* graph, int src, int dest, int type){
 void printGraph(struct Graph* graph)
 {
   struct node* temp;
-  
+
   for (int i = 1; i < MAX_NODES; i++){
     //prints node's i clients
     temp = graph->a_list_c[i];
@@ -240,16 +227,31 @@ int pop_queue( struct Queue* queue )
   return item;
 }
 
+/******************************************************************************
+ * Function: check_length_type()
+ *    Input: graph struct, queue struct, input source node, input destination
+ *           node, and the menu selection (either statistics (5), specific
+ *           length (2) or specific type (1)
+ *     Task: If the question is either (1) or (2), it calls the BGP algorithm
+ *           for the destination given and prints the asked type or asked length
+ *           respectively. If the question is (5), it calls the BGP for all
+ *           nodes, and prints all the statistics.
+ *   Output: none
+ *****************************************************************************/
 void check_length_type(struct Graph * graph, struct Queue * queue, int src, int dest, int question){
   struct node* temp;
+  //array that stores length of each node to the destination
   int *length = (int*)malloc(MAX_NODES*sizeof(int));
+  //array that stores current path type of each node to the destination
   int *curr_type = (int*)malloc(MAX_NODES*sizeof(int));
-  int *final_length = (int*)malloc(11*sizeof(int));
+  //array that stores the number of paths with a specific length
+  int *final_length = (int*)malloc(16*sizeof(int));
+   //array that stores the number of paths of a specific type
   int *final_type = (int*)malloc(4*sizeof(int));
 
   int ans = 0, ans_ = 0;
 
-
+  //initialization of the length and type vectors
   for(int i = 0; i < MAX_NODES; i++){
     if(graph->a_list[i] != 0){
       length[i] = MAX_NODES;
@@ -266,6 +268,7 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
     }
   }
 
+  //if the menu selection was 5, call BGP function to all nodes
   if(question == 5){
     int n = 0;
     for(int i = 1; i < MAX_NODES; i++){
@@ -277,10 +280,11 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
       }
     }
   }
+  //if the menu selection was 1 or 2, call BGP function to the given source and destination node
   else{
     ans = BGP(graph, queue, dest, length, curr_type, final_length, final_type, src, dest, question);
   }
-
+  //print the asked type
   if(question == 1){
     if(ans == 0)
       printf("There is no path from %d to %d\n",src, dest);
@@ -291,6 +295,7 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
     else if(ans == 3)
       printf("The path from %d to %d is a provider path\n",src, dest);
   }
+  //print the asked length
   else if(question == 2){
     if (ans == MAX_NODES)
       printf("There is no commercial path from %d to %d\n", src, dest);
@@ -299,6 +304,7 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
 
 
   }
+  //print all statistics
   else if(question == 5){
     printf("Types statistics:\n"
             "The number of invalid paths is %d\n"
@@ -318,11 +324,18 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
             "The number of paths with length 7 is %d\n"
             "The number of paths with length 8 is %d\n"
             "The number of paths with length 9 is %d\n"
-            "The number of paths with length 10+ is %d\n",
+            "The number of paths with length 10 is %d\n"
+            "The number of paths with length 11 is %d\n"
+            "The number of paths with length 12 is %d\n"
+            "The number of paths with length 13 is %d\n"
+            "The number of paths with length 14 is %d\n"
+            "The number of paths with length 15+ is %d\n",
             final_length[0], final_length[1], final_length[2], final_length[3], final_length[4], final_length[5],
-            final_length[6], final_length[7], final_length[8], final_length[9], final_length[10]);
+            final_length[6], final_length[7], final_length[8], final_length[9], final_length[10], final_length[11],
+            final_length[12], final_length[13], final_length[14], final_length[15]);
   }
 
+  //free arrays
   free(length);
   free(curr_type);
   free(final_length);
@@ -330,24 +343,41 @@ void check_length_type(struct Graph * graph, struct Queue * queue, int src, int 
 
 }
 
-int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int * curr_type, int * final_length, int* final_type, int source, int dest, int question){
+/***************************************************************************
+ * Function: BGP()
+ *    Input: graph struct, queue struct, destination node, length array,
+ *           type array, final length array (for stats), final type array
+ *           (for stats), input source node, input destination node, input
+ *           menu selection
+ *     Task: Function that gets a destination node and finds the types and
+ *           lengths of the BGP paths from every other node to that node
+ *   Output: returns either the type or the length of the path from the
+ *           source node to the destination node introduced by the user
+ **************************************************************************/
+int BGP(struct Graph * graph, struct Queue * queue, int dest, int * length, int * curr_type, int * final_length, int* final_type, int source, int destination, int question){
 
-  struct node* temp, *temp1, *temp2, *temp3, *node;
+  struct node* temp, *node ,*bgp_temp, *bgp_temp_free;
   int asked_len = 0;
   int asked_type = 0;
   int a = 0;
+  int id_pop = 0;
 
-  push_queue(queue, src);
-  curr_type[src] = -1;
-  length[src] = 0;
+  //put destination node in queue so it's the first one to be visited
+  push_queue(queue, dest);
+  //set the type of the destination node to -1
+  curr_type[dest] = -1;
+  //set the length of the destination node to 0
+  length[dest] = 0;
 
   while (queue->count != 0){
-    int id_pop = pop_queue(queue);
+    //sees next node in queue
+    id_pop = pop_queue(queue);
 
+    //loops through the providers of id_pop
     temp = graph->a_list_p[id_pop];
-
     while(temp){
-      if(temp->name != src && (curr_type[id_pop] == -1 || curr_type[id_pop] == 1) && (curr_type[temp->name] == 0 || curr_type[temp->name] > 1)){
+      //checks if the commercial rules are met and if the best path according to BGP is found
+      if(temp->name != dest && (curr_type[id_pop] == -1 || curr_type[id_pop] == 1) && (curr_type[temp->name] == 0 || curr_type[temp->name] > 1)){
         length[temp->name] = length[id_pop] + 1;
         curr_type[temp->name] = temp->type;
         push_queue(queue, temp->name);
@@ -355,10 +385,11 @@ int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int *
       temp = temp->next;
     }
 
+    //loops through the peers of id_pop
     temp = graph->a_list_r[id_pop];
-
     while(temp){
-      if(curr_type[temp->name] == 0 && temp->name != src && (curr_type[id_pop] == -1 || curr_type[id_pop] == 1)){
+      //checks if the commercial rules are met and if the best path according to BGP is found
+      if(curr_type[temp->name] == 0 && temp->name != dest && (curr_type[id_pop] == -1 || curr_type[id_pop] == 1)){
         length[temp->name] = length[id_pop] + 1;
         curr_type[temp->name] = temp->type;
         push_queue(queue, temp->name);
@@ -367,13 +398,17 @@ int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int *
     }
   }
 
+  //loops through the nodes that are in the queue
   for(int i = 0; i < MAX_NODES; i++){
     if(queue->array[i] == 0)
         break;
     else{
+      //sees their immediate customers
       temp = graph->a_list_c[queue->array[i]];
       while(temp){
-        if(temp->name != src && length[temp->name] == MAX_NODES){
+        //checks if the node has been visited
+        if(temp->name != dest && length[temp->name] == MAX_NODES){
+          //if not, creates a node and stores it in bgp_clients array
           node = createNode(temp->name, 3);
           a = length[queue->array[i]] + 1;
           if(graph->bgp_clients[a] == NULL)
@@ -388,17 +423,23 @@ int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int *
     }
   }
 
-  struct node* bgp_temp, *bgp_temp_free;
+  //loops through bgp_clients array
   for (int i = 1; i < MAX_NODES; i++){
+    //loops through array list
     bgp_temp = graph->bgp_clients[i];
     while(bgp_temp){
+      //checks if the node has been visited
       if(length[bgp_temp->name] == MAX_NODES){
+        //if not, changes its length to the length of bgp_clients
         length[bgp_temp->name] = i;
+        //type is always 3 because we are only seeing customers
         curr_type[bgp_temp->name] = 3;
-
+        //loops through the customers of the node
         temp = graph->a_list_c[bgp_temp->name];
         while(temp){
-          if(temp->name != src && length[temp->name] == MAX_NODES){
+          //checks if the node has been visited
+          if(temp->name != dest && length[temp->name] == MAX_NODES){
+            //if not, adds it to bgp_clients
             node = createNode(temp->name, 3);
             a = length[bgp_temp->name] + 1;
             if(graph->bgp_clients[a] == NULL)
@@ -411,6 +452,7 @@ int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int *
           temp = temp->next;
         }
       }
+      //frees nodes that have been visited and have their length already in the length array
       bgp_temp_free = graph->bgp_clients[i];
       graph->bgp_clients[i] = bgp_temp_free->next;
       free(bgp_temp_free);
@@ -419,22 +461,27 @@ int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int *
   }
 
   for(int i = 1; i < MAX_NODES ; i++ ){
+    //statistics
     if(question == 5){
+      //counts the number of times each type appears (0 are invalid paths)
       if(curr_type[i] >= 0){
         a = curr_type[i];
         final_type[a] = final_type[a] + 1;
       }
-      if(length[i] > 9 && length[i] != MAX_NODES)
-        final_length[10] = final_length[10] + 1;
-      else if(length[i] < 10 && length[i] != MAX_NODES && length[i] != -2){
+      //counts the number of times each length appears (10+ is one category)
+      if(length[i] > 14 && length[i] != MAX_NODES)
+        final_length[15] = final_length[15] + 1;
+      else if(length[i] < 15 && length[i] != MAX_NODES && length[i] != -2){
         a = length[i];
         final_length[a] = final_length[a] + 1;
       }
     }
-    if(src == dest && i == source){
+    //checks if this is the source-destination pair introduced by the user and if it is stores the length and type
+    if(dest == destination && i == source){
       asked_len = length[i];
       asked_type = curr_type[i];
     }
+    //initialise variables
     if(graph->a_list[i] != 0){
       length[i] = MAX_NODES;
       curr_type[i] = 0;
@@ -446,29 +493,50 @@ int BGP(struct Graph * graph, struct Queue * queue, int src, int * length, int *
     queue->array[i] = 0;
   }
 
+  //initialise variables
   queue->count = 0;
   queue->head = 0;
   queue->tail = 0;
 
+  //checks if the user asked for the type or the length and returns the one solicited
   if(question == 1)
     return asked_type;
   else if(question == 2)
     return asked_len;
 }
 
+/******************************************************************************
+ * Function: check_length_type()
+ *    Input: graph struct, queue struct, input source node, input destination
+ *           node, and the menu selection (either statistics (6), specific
+ *           length (3)
+ *     Task: If the question is (3), it calls the BGP_shortest algorithm
+ *           for the destination given and prints the asked length. If the question
+ *           is (6), it calls the BGP_shortest for all nodes, and prints all
+ *           the statistics.
+ *   Output: none
+ *****************************************************************************/
 void check_length_shortest (struct Graph * graph, struct Queue * queue, int src, int dest, int question){
   struct node* temp;
+  //array that stores the length of each node to the destination
   int *length = (int*)malloc(MAX_NODES*sizeof(int));
+  //array that stores the length of each node from a customer-provider link to the destination
   int *length_p = (int*)malloc(MAX_NODES* sizeof(int));
+  //array that stores the length of each node from a peer-to-peer link to the destination
   int *length_r = (int*)malloc(MAX_NODES* sizeof(int));
+  //array that stores the length of each node from a provider-customer link to the destination
   int *length_c = (int*)malloc(MAX_NODES* sizeof(int));
+  //array that stores current path type of each node to the destination
   int *curr_type = (int*)malloc(MAX_NODES*sizeof(int));
-  int *final_length = (int*)malloc(11*sizeof(int));
-  int *final_type = (int*)malloc(4*sizeof(int));
+
+  //array that stores the number of paths with a specific length
+  int *final_length = (int*)calloc(16,sizeof(int));
+  //array that stores the number of paths of a specific type
+  int *final_type = (int*)calloc(4,sizeof(int));
 
   int ans = 0, ans_ = 0;
 
-
+  //initialization of all length vectors and current type vector
   for(int i = 0; i < MAX_NODES; i++){
     if(graph->a_list[i] != 0){
       length[i] = MAX_NODES;
@@ -484,13 +552,8 @@ void check_length_shortest (struct Graph * graph, struct Queue * queue, int src,
       length_c[i] = -2;
       curr_type[i] = -2;
     }
-    if(i < 11){
-       final_length[i] = 0;
-      if(i < 4)
-        final_type[i] = 0;
-    }
   }
-
+  //if the menu selection was 6, call BGP_shortest function to all nodes
   if(question == 6){
     int n = 0;
     for(int i = 1; i < MAX_NODES; i++){
@@ -502,16 +565,18 @@ void check_length_shortest (struct Graph * graph, struct Queue * queue, int src,
       }
     }
   }
+  //if the menu selection was 3, call BGP_shortest function to the given source and destination node
   else{
     ans = BGP_shortest(graph, queue, dest, length, length_p, length_r, length_c, curr_type, final_length, final_type, src, dest, question);
   }
-
+  //print the asked length
   if(question == 3){
     if (ans == MAX_NODES)
       printf("There is no commercial path from %d to %d\n", src, dest);
     else
       printf("The length of the path from %d to %d is %d\n", src, dest, ans);
   }
+  //print all the statistics
   else if(question == 6){
     printf("Lengths statistics :\n"
             "The number of paths with length 0 is %d\n"
@@ -524,13 +589,20 @@ void check_length_shortest (struct Graph * graph, struct Queue * queue, int src,
             "The number of paths with length 7 is %d\n"
             "The number of paths with length 8 is %d\n"
             "The number of paths with length 9 is %d\n"
-            "The number of paths with length 10+ is %d\n",
+            "The number of paths with length 10 is %d\n"
+            "The number of paths with length 11 is %d\n"
+            "The number of paths with length 12 is %d\n"
+            "The number of paths with length 13 is %d\n"
+            "The number of paths with length 14 is %d\n"
+            "The number of paths with length 15+ is %d\n",
             final_length[0], final_length[1], final_length[2], final_length[3], final_length[4], final_length[5],
-            final_length[6], final_length[7], final_length[8], final_length[9], final_length[10]);
+            final_length[6], final_length[7], final_length[8], final_length[9], final_length[10], final_length[11],
+            final_length[12], final_length[13], final_length[14], final_length[15]);
 
-     printf("Types statistics: %d %d %d %d\n", final_type[0], final_type[1], final_type[2], final_type[3]);
+    printf("Types statistics: %d %d %d %d\n", final_type[0], final_type[1], final_type[2], final_type[3]);
   }
 
+  //free arrays
   free(length);
   free(length_p);
   free(length_r);
@@ -542,216 +614,147 @@ void check_length_shortest (struct Graph * graph, struct Queue * queue, int src,
 
 }
 
-int BGP_shortest(struct Graph * graph, struct Queue * queue, int src, int * length, int * length_p, int * length_r, int * length_c,
-                  int * curr_type, int * final_length, int * final_type, int source, int dest, int question){
+/***************************************************************************
+ * Function: BGP_shortest()
+ *    Input: graph struct, queue struct, destination node, length array,
+ *           provider's length array, peer's length array, customer's length
+ *           array, type array, final length array (for stats), final type
+ *           array (for stats), input source node, input destination node,
+ *           input menu selection
+ *     Task: Function that gets a destination node and finds the lengths of
+ *           the shortest BGP paths from every other node to that node
+ *   Output: returns the length of the path from the source node to the
+ *           destination node introduced by the user
+ **************************************************************************/
+int BGP_shortest(struct Graph * graph, struct Queue * queue, int dest, int * length, int * length_p, int * length_r, int * length_c,
+                  int * curr_type, int * final_length, int * final_type, int source, int destination, int question){
 
-  struct node* temp, *temp1, *temp2, *temp3, *node;
+  struct node* temp, *node, *bgp_temp, *bgp_temp_free;
   int asked_len = 0;
   int asked_type = 0;
   int a = 0;
+  int id_pop = 0;
 
-  push_queue(queue, src);
-  curr_type[src] = -1;
-  length_p[src] = 0;
-  length_r[src] = 0;
-  length_c[src] = 0;
-  length[src] = 0;
+  //put destination node in queue so it's the first one to be visited
+  push_queue(queue, dest);
+  //set the type of the destination node to -1
+  curr_type[dest] = -1;
+  //set the length of the destination node to 0 on all arrays
+  length_p[dest] = 0;
+  length_r[dest] = 0;
+  length_c[dest] = 0;
+  length[dest] = 0;
 
   while (queue->count != 0){
-    int id_pop = pop_queue(queue);
-    //printf("pop %d\n", id_pop);
+    //sees next node in queue
+    id_pop = pop_queue(queue);
+
+    //loops through the providers of id_pop
     temp = graph->a_list_p[id_pop];
-
     while(temp){
-      // printf("sou  %d\n", temp->name);
-      // printf("no provider pop type %d\n", queue_types[queue->head-1]);
-      // printf("no provider type %d\n", curr_type[temp->name]);
-      if(temp->name != src && (curr_type[id_pop] == -1 || curr_type[id_pop] == 1) && (curr_type[temp->name] == 0 || curr_type[temp->name] > 1)){
-      //if(temp->name != src && length_p[id_pop] != MAX_NODES && (length_p[temp->name] == MAX_NODES || length_r[temp->name] != MAX_NODES)){
-        // if(length[id_pop] + 1 < length[temp->name])
-        //   length[temp->name] = length[id_pop] + 1;
-        // printf("queue len %d\n", queue_lengths[queue->head-1]);
-        // printf("temp len %d\n\n",length[temp->name]);
-        //if(queue_lengths[queue->head-1] + 1 < length[temp->name])
+      //checks if the commercial rules are met and if the best path according to BGP is found
+      if(temp->name != dest && (curr_type[id_pop] == -1 || curr_type[id_pop] == 1) && (curr_type[temp->name] == 0 || curr_type[temp->name] > 1)){
         length_p[temp->name] = length_p[id_pop] + 1;
-        //length[temp->name] = queue_lengths[queue->head-1] + 1;
-        //printf("souuuuuuuuuuuuuu  %d\n", temp->name);
         curr_type[temp->name] =  temp->type;
-        // queue_types[queue->tail] = temp->type;
-        // queue_lengths[queue->tail] = queue_lengths[queue->head-1] + 1;
         push_queue(queue, temp->name);
       }
       temp = temp->next;
     }
 
+    //loops through the peers of id_pop
     temp = graph->a_list_r[id_pop];
-
     while(temp){
-      // printf("sou  %d\n", temp->name);
-      // printf("no peer pop type %d\n", queue_types[queue->head-1]);
-      // printf("no peer type %d\n", curr_type[temp->name]);
-      //if( temp->name != src  && (length_r[id_pop] == 0 || length_p[id_pop] != MAX_NODES)){
-      if(curr_type[temp->name] == 0 && temp->name != src && (curr_type[id_pop] == -1 || curr_type[id_pop] == 1)){
-      // printf("queue len %d\n", queue_lengths[queue->head-1]);
-      // printf("temp len %d\n\n",length[temp->name]);
-        //if(queue_lengths[queue->head-1] + 1 < length[temp->name])
+      //checks if the commercial rules are met and if the best path according to BGP is found
+      if(curr_type[temp->name] == 0 && temp->name != dest && (curr_type[id_pop] == -1 || curr_type[id_pop] == 1)){
         length_r[temp->name] = length_p[id_pop] + 1;
-        //length[temp->name] = queue_lengths[queue->head-1] + 1;
         curr_type[temp->name] = temp->type;
-        // queue_types[queue->tail] = temp->type;
-        // queue_lengths[queue->tail] = queue_lengths[queue->head-1] + 1;
         push_queue(queue, temp->name);
       }
       temp = temp->next;
     }
-    //printf("tenho\n");
   }
-  // printf(" [");
-  // for(int y = 0; y < 12; y++){
-  //     printf("%d     ", length_p[y]);
-  // }
-  // printf("]\n");
 
-  //  printf(" [");
-  // for(int y = 0; y < 12; y++){
-  //     printf("%d     ", length_r[y]);
-  // }
-  // printf("]\n");
-
-  // printf("\n");
-
+  //loops through the nodes that are in the queue
   for(int i = 0; i < MAX_NODES; i++){
     if(queue->array[i] == 0)
         break;
     else{
+      //sees their immediate customers
       temp = graph->a_list_c[queue->array[i]];
-
-     // printf("sou o %d\n", queue->array[i]);
       while(temp){
-        // printf("sou o queue %d\n", queue->array[i]);
-        // printf("sou o filho %d\n", temp->name);
-        // printf("tenho %d\n", queue_types[i]);
-        // printf("tenho %d\n", queue_lengths[temp->name]);
-        // printf("tenho %d\n", length[temp->name]);
-
-
+        //checks if the node has been visited by provider path and peer path
         if((length_p[queue->array[i]] != MAX_NODES && length_r[queue->array[i]] != MAX_NODES)){
+          //if yes, it puts the immediate clientes of the one with the shortest length in the bgp_client list array
+          node = createNode(temp->name, 3);
           if(length_p[queue->array[i]] < length_r[queue->array[i]])
-          {
-            node = createNode(temp->name, 3);
             a = length_p[queue->array[i]] + 1;
-            //length_c[temp->name] = length_p[queue->array[i]] + 1;
-            if(graph->bgp_clients[a] == NULL)
-              graph->bgp_clients[a] = node;
-            else{
-              node->next = (graph->bgp_clients[a])->next;
-              (graph->bgp_clients[a])->next = node;
-            }
-          }
-          else{
-            node = createNode(temp->name, 3);
+          else
             a = length_r[queue->array[i]] + 1;
-            //length_c[temp->name] = length_r[queue->array[i]] + 1;
-            if(graph->bgp_clients[a] == NULL)
-              graph->bgp_clients[a] = node;
-            else{
-              node->next = (graph->bgp_clients[a])->next;
-              (graph->bgp_clients[a])->next = node;
-            }
-          }
-        }
-        else if((length_p[queue->array[i]] + 1 < length_p[temp->name])){
-          node = createNode(temp->name, 3);
-          a = length_p[queue->array[i]] + 1;
-          //length_c[temp->name] = length_p[queue->array[i]] + 1;
-          if(graph->bgp_clients[a] == NULL)
-            graph->bgp_clients[a] = node;
-          else{
-            node->next = (graph->bgp_clients[a])->next;
-            (graph->bgp_clients[a])->next = node;
-          }
-        }
-        else if((length_r[queue->array[i]] + 1 < length_r[temp->name])){
-          node = createNode(temp->name, 3);
-          a = length_r[queue->array[i]] + 1;
-          //length_c[temp->name] = length_r[queue->array[i]] + 1;
-          if(graph->bgp_clients[a] == NULL)
-            graph->bgp_clients[a] = node;
-          else{
-            node->next = (graph->bgp_clients[a])->next;
-            (graph->bgp_clients[a])->next = node;
-          }
-        }
 
+          if(graph->bgp_clients[a] == NULL)
+            graph->bgp_clients[a] = node;
+          else{
+            node->next = (graph->bgp_clients[a])->next;
+            (graph->bgp_clients[a])->next = node;
+          }
+        }
+        //if it was only visited by a provider or a peer, and if the new length is either
+        //shorter than the one seen before or never seen
+        else{
+          //it creates a node, and stores it in bgp_clients array
+          node = createNode(temp->name, 3);
+          if((length_p[queue->array[i]] + 1 < length_p[temp->name]))
+            a = length_p[queue->array[i]] + 1;
+          else if(length_r[queue->array[i]] + 1 < length_r[temp->name])
+            a = length_r[queue->array[i]] + 1;
+
+          if(graph->bgp_clients[a] == NULL)
+            graph->bgp_clients[a] = node;
+          else{
+            node->next = (graph->bgp_clients[a])->next;
+            (graph->bgp_clients[a])->next = node;
+          }
+        }
         temp = temp->next;
       }
     }
   }
 
-  // printf(" [");
-  // for(int y = 0; y < 12; y++){
-  //     printf("%d     ", queue->array[y]);
-  // }
-  // printf("]\n");
-
-  // printf(" [");
-  // for(int y = 0; y < 12; y++){
-  //     printf("%d     ", queue_types[y]);
-  // }
-  // printf("]\n");
-
-  // printf(" [");
-  // for(int y = 0; y < 12; y++){
-  //     printf("%d     ", queue_lengths[y]);
-  // }
-  // printf("]\n");
-
-  // printf(" [");
-  // for(int y = 1; y < 12; y++){
-  //     printf("%d     ", length_c[y]);
-  // }
-  // printf("]\n");
-
-  // printf("\n");
-
-  struct node* bgp_temp, *bgp_temp_free, *temp_free;
+  //loops through bgp_clients array
   for (int i = 1; i < MAX_NODES; i++){
+    //loops through array list
     bgp_temp = graph->bgp_clients[i];
     while(bgp_temp){
-      // printf("idd bgp %d ->", i); //print the node
-      // printf(" %d,%d -> \n", bgp_temp->name, bgp_temp->type); //print node's adjacents
-      // printf(" bgp %d\n", length[bgp_temp->name]);
+      //checks if the node has been visited with a bigger path, or not visited at all
       if(length_c[bgp_temp->name] > i){
-        //printf("entrei bgp %d\n", bgp_temp->name);
+        //if yes, it changes its length to the length of bgp_clients
         length_c[bgp_temp->name] = i;
+        //loops through the customers of the node
         temp = graph->a_list_c[bgp_temp->name];
-        //printf("sou bgp pai %d\n", bgp_temp->name);
         while(temp){
-          // printf("sou o bgp filho %d\n", temp->name);
-          // printf("tenho %d\n", length[temp->name]);
-          if(((length_c[bgp_temp->name] + 1) < length_c[temp->name])){
-           // printf("cria no %d\n", temp->name);
+          //checks if its customers have been visited with a bigger path, or not visited at all
+          if((length_c[bgp_temp->name] + 1) < length_c[temp->name]){
+            //if yes, adds it to bgp_clients
             node = createNode(temp->name, 3);
             a = length_c[bgp_temp->name] + 1;
-            //printf("a  %d\n", a);
             if(graph->bgp_clients[a] == NULL)
               graph->bgp_clients[a] = node;
             else{
               node->next = (graph->bgp_clients[a])->next;
               (graph->bgp_clients[a])->next = node;
-
             }
           }
           temp = temp->next;
         }
       }
-
+      //frees nodes that have been visited and have their length already in the length array
       bgp_temp_free = graph->bgp_clients[i];
       graph->bgp_clients[i] = bgp_temp_free->next;
       free(bgp_temp_free);
       bgp_temp = graph->bgp_clients[i];
     }
   }
+
 
   // for(int i = 1; i < MAX_NODES; i ++){
   //   if(length_p[i] != MAX_NODES && length_p[i] != -2){
@@ -802,9 +805,8 @@ int BGP_shortest(struct Graph * graph, struct Queue * queue, int src, int * leng
     // printf("\n");
     // printf("\n");
 
-
-
   for(int i = 1; i < MAX_NODES ; i++ ){
+    //saves lengths by order of BGP preferences
     if(length_p[i] != MAX_NODES && length_p[i] != -2){
     length[i] = length_p[i];
     if(length[i] != 0)
@@ -818,23 +820,27 @@ int BGP_shortest(struct Graph * graph, struct Queue * queue, int src, int * leng
       length[i] = length_c[i];
       curr_type[i] = 3;
     }
-
+    //statistics
     if(question == 6){
+      //counts the number of times each type appears (0 are invalid paths)
       if(curr_type[i] >= 0){
         a = curr_type[i];
         final_type[a] = final_type[a] + 1;
       }
-      if(length[i] > 9 && length[i] != MAX_NODES)
-        final_length[10] = final_length[10] + 1;
-      else if(length[i] < 10 && length[i] != MAX_NODES && length[i] != -2){
+      //counts the number of times each length appears (10+ is one category)
+      if(length[i] > 14 && length[i] != MAX_NODES)
+        final_length[15] = final_length[15] + 1;
+      else if(length[i] < 15 && length[i] != MAX_NODES && length[i] != -2){
         a = length[i];
         final_length[a] = final_length[a] + 1;
       }
     }
-    if(src == dest && i == source){
+    //checks if this is the source-destination pair introduced by the user and if it is stores the length and type
+    if(dest == destination && i == source){
       asked_len = length[i];
       asked_type = curr_type[i];
     }
+    //initialise variables
     if(graph->a_list[i] != 0){
       length[i] = MAX_NODES;
       length_p[i] = MAX_NODES;
@@ -851,7 +857,7 @@ int BGP_shortest(struct Graph * graph, struct Queue * queue, int src, int * leng
     }
     queue->array[i] = 0;
   }
-
+  //initialise variables
   queue->count = 0;
   queue->head = 0;
   queue->tail = 0;
@@ -869,6 +875,7 @@ void freeAll(struct Graph * graph, struct Queue * queue){
 
   struct node * temp, *temp1, *temp2;
 
+  //loop through all the adjacency lists and free all elfs
   for (int i = 0; i < MAX_NODES; i++){
     while(graph->a_list_c[i] != NULL){
       temp = graph->a_list_c[i];
@@ -887,7 +894,6 @@ void freeAll(struct Graph * graph, struct Queue * queue){
     }
   }
 
-  free(graph->tier1);
   free(graph->a_list_p);
   free(graph->a_list_r);
   free(graph->a_list_c);

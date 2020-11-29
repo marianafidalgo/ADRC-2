@@ -2,7 +2,10 @@
 #define FUNC_H
 
 #define MAX_NODES 65536
-#define min(A,B) ((A)<=(B)?(A):(B))
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 struct node {
   int name;
@@ -10,18 +13,14 @@ struct node {
   struct node *next;
 };
 
-struct node *desti, *source, *newNode, *temp, *pCrawl;
-
 struct Graph {
     int num_V; // number of nodes
-    struct node ** a_list_c; //adjacency list
-    struct node ** a_list_r; //adjacency list
-    struct node ** a_list_p; //adjacency list
+    struct node ** a_list_c; //customers adjacency list
+    struct node ** a_list_r; //peers adjacency list
+    struct node ** a_list_p; //providers adjacency list
 
-    struct node ** bgp_clients; //adjacency list
-    int * a_list; //adjacency list
-    int * tier1; //stores tier 1 nodes
-    int n_tier1; //number of tier 1 nodes
+    struct node ** bgp_clients; //lengths of customers
+    int * a_list; //array of existing nodes
 };
 
 struct Queue {
