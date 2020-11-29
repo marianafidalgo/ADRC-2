@@ -653,7 +653,8 @@ int BGP_shortest(struct Graph * graph, struct Queue * queue, int dest, int * len
     temp = graph->a_list_p[id_pop];
     while(temp){
       //checks if the commercial rules are met and if the best path according to BGP is found
-      if(temp->name != dest && (curr_type[id_pop] == -1 || curr_type[id_pop] == 1) && (curr_type[temp->name] == 0 || curr_type[temp->name] > 1)){
+      if(temp->name != dest && (curr_type[id_pop] == -1 || curr_type[id_pop] == 1) &&
+      ((curr_type[temp->name] == 0 || curr_type[temp->name] > 1) || (curr_type[temp->name] == 1 && (length_p[id_pop] + 1 < length_p[temp->name] )))){
         length_p[temp->name] = length_p[id_pop] + 1;
         curr_type[temp->name] =  temp->type;
         push_queue(queue, temp->name);
@@ -665,7 +666,8 @@ int BGP_shortest(struct Graph * graph, struct Queue * queue, int dest, int * len
     temp = graph->a_list_r[id_pop];
     while(temp){
       //checks if the commercial rules are met and if the best path according to BGP is found
-      if(curr_type[temp->name] == 0 && temp->name != dest && (curr_type[id_pop] == -1 || curr_type[id_pop] == 1)){
+      if(temp->name != dest && (curr_type[id_pop] == -1 || curr_type[id_pop] == 1) &&
+      (curr_type[temp->name] == 0 || (curr_type[temp->name] == 2 && (length_p[id_pop] + 1 < length_r[temp->name])))){
         length_r[temp->name] = length_p[id_pop] + 1;
         curr_type[temp->name] = temp->type;
         push_queue(queue, temp->name);
@@ -679,43 +681,65 @@ int BGP_shortest(struct Graph * graph, struct Queue * queue, int dest, int * len
     if(queue->array[i] == 0)
         break;
     else{
-      //sees their immediate customers
-      temp = graph->a_list_c[queue->array[i]];
-      while(temp){
-        //checks if the node has been visited by provider path and peer path
-        if((length_p[queue->array[i]] != MAX_NODES && length_r[queue->array[i]] != MAX_NODES)){
+      //checks if the node has been visited by provider path and peer path
+      if((length_p[queue->array[i]] != MAX_NODES && length_r[queue->array[i]] != MAX_NODES)){
+        //sees their immediate customers
+        temp = graph->a_list_c[queue->array[i]];
+        while(temp){
           //if yes, it puts the immediate clientes of the one with the shortest length in the bgp_client list array
-          node = createNode(temp->name, 3);
-          if(length_p[queue->array[i]] < length_r[queue->array[i]])
+          if((length_p[queue->array[i]] <= length_r[queue->array[i]]) && ((length_p[queue->array[i]] + 1) < length_p[temp->name]) && ((length_p[queue->array[i]] + 1) < length_r[temp->name])){
+            node = createNode(temp->name, 3);
             a = length_p[queue->array[i]] + 1;
-          else
-            a = length_r[queue->array[i]] + 1;
-
-          if(graph->bgp_clients[a] == NULL)
-            graph->bgp_clients[a] = node;
-          else{
-            node->next = (graph->bgp_clients[a])->next;
-            (graph->bgp_clients[a])->next = node;
+            if(graph->bgp_clients[a] == NULL)
+              graph->bgp_clients[a] = node;
+            else{
+              node->next = (graph->bgp_clients[a])->next;
+              (graph->bgp_clients[a])->next = node;
+            }
           }
+          else if((length_p[queue->array[i]] >= length_r[queue->array[i]]) && ((length_r[queue->array[i]] + 1) < length_p[temp->name]) && ((length_r[queue->array[i]] + 1) < length_r[temp->name])){
+            node = createNode(temp->name, 3);
+            a = length_r[queue->array[i]] + 1;
+            if(graph->bgp_clients[a] == NULL)
+              graph->bgp_clients[a] = node;
+            else{
+              node->next = (graph->bgp_clients[a])->next;
+              (graph->bgp_clients[a])->next = node;
+            }
+          }
+          temp = temp->next;
         }
-        //if it was only visited by a provider or a peer, and if the new length is either
-        //shorter than the one seen before or never seen
-        else{
-          //it creates a node, and stores it in bgp_clients array
-          node = createNode(temp->name, 3);
-          if((length_p[queue->array[i]] + 1 < length_p[temp->name]))
+      }
+      //if it was only visited by a provider or a peer path
+      else{
+        temp = graph->a_list_c[queue->array[i]];
+        while(temp){
+          //check if the new length is smaller than the one it currently has on the provider path
+          if((length_p[queue->array[i]] + 1 < length_p[temp->name])){
+            //creates a node, and stores it in bgp_clients array
+            node = createNode(temp->name, 3);
             a = length_p[queue->array[i]] + 1;
-          else if(length_r[queue->array[i]] + 1 < length_r[temp->name])
-            a = length_r[queue->array[i]] + 1;
-
-          if(graph->bgp_clients[a] == NULL)
-            graph->bgp_clients[a] = node;
-          else{
-            node->next = (graph->bgp_clients[a])->next;
-            (graph->bgp_clients[a])->next = node;
+            if(graph->bgp_clients[a] == NULL)
+              graph->bgp_clients[a] = node;
+            else{
+              node->next = (graph->bgp_clients[a])->next;
+              (graph->bgp_clients[a])->next = node;
+            }
           }
+          //check if the new length is smaller than the one it currently has on the peer path
+          else if((length_r[queue->array[i]] + 1 < length_r[temp->name])){
+            //creates a node, and stores it in bgp_clients array
+            node = createNode(temp->name, 3);
+            a = length_r[queue->array[i]] + 1;
+            if(graph->bgp_clients[a] == NULL)
+              graph->bgp_clients[a] = node;
+            else{
+              node->next = (graph->bgp_clients[a])->next;
+              (graph->bgp_clients[a])->next = node;
+            }
+          }
+          temp = temp->next;
         }
-        temp = temp->next;
       }
     }
   }
