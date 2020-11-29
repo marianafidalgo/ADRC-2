@@ -610,8 +610,6 @@ void check_length_shortest (struct Graph * graph, struct Queue * queue, int src,
   free(curr_type);
   free(final_length);
   free(final_type);
-  exit(0);
-
 }
 
 /***************************************************************************
@@ -715,7 +713,7 @@ int BGP_shortest(struct Graph * graph, struct Queue * queue, int dest, int * len
         temp = graph->a_list_c[queue->array[i]];
         while(temp){
           //check if the new length is smaller than the one it currently has on the provider path
-          if((length_p[queue->array[i]] + 1 < length_p[temp->name])){
+          if((length_p[queue->array[i]] + 1 < length_p[temp->name]) && ((length_p[queue->array[i]] + 1) < length_r[temp->name])){
             //creates a node, and stores it in bgp_clients array
             node = createNode(temp->name, 3);
             a = length_p[queue->array[i]] + 1;
@@ -727,7 +725,7 @@ int BGP_shortest(struct Graph * graph, struct Queue * queue, int dest, int * len
             }
           }
           //check if the new length is smaller than the one it currently has on the peer path
-          else if((length_r[queue->array[i]] + 1 < length_r[temp->name])){
+          else if((length_r[queue->array[i]] + 1 < length_r[temp->name]) && ((length_r[queue->array[i]] + 1) < length_p[temp->name])){
             //creates a node, and stores it in bgp_clients array
             node = createNode(temp->name, 3);
             a = length_r[queue->array[i]] + 1;
@@ -778,56 +776,6 @@ int BGP_shortest(struct Graph * graph, struct Queue * queue, int dest, int * len
       bgp_temp = graph->bgp_clients[i];
     }
   }
-
-
-  // for(int i = 1; i < MAX_NODES; i ++){
-  //   if(length_p[i] != MAX_NODES && length_p[i] != -2){
-  //     length[i] = length_p[i];
-  //     if(length[i] != 0)
-  //       curr_type[i] = 1;
-  //   }
-  //   else if( length_r[i] != MAX_NODES && length_r[i] != -2){
-  //     length[i] = length_r[i];
-  //     curr_type[i] = 2;
-  //   }
-  //   else if( length_c[i] != MAX_NODES && length_c[i] != -2){
-  //     length[i] = length_c[i];
-  //     curr_type[i] = 3;
-  //   }
-  // }
-
-
-    // printf(" [");
-    // for(int y = 1; y < 12; y++){
-    //     printf("%d     ", length_p[y]);
-    // }
-    // printf("]\n");
-
-    // printf("\n");
-
-    // printf(" [");
-    // for(int y = 1; y < 12; y++){
-    //     printf("%d     ", length_r[y]);
-    // }
-    // printf("]\n");
-
-    // printf("\n");
-
-    // printf(" [");
-    // for(int y = 1; y < 12; y++){
-    //     printf("%d     ", length_c[y]);
-    // }
-    // printf("]\n");
-
-    //  printf(" [");
-    // for(int y = 1; y < 14; y++){
-    //     printf("%d     ", length[y]);
-    // }
-    // printf("]\n");
-
-    // printf("\n");
-    // printf("\n");
-    // printf("\n");
 
   for(int i = 1; i < MAX_NODES ; i++ ){
     //saves lengths by order of BGP preferences
